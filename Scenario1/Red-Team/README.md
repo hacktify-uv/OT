@@ -3,7 +3,7 @@
 **Prabal Urja Hydroelectric Power Station | Red Team practical write-up**
 
 **Exercise:** Unit-2 operations console and OPC UA telemetry gateway  
-**Target in this run:** `172.24.4.26`  
+**Target in this run:** `<ip>`  
 **Red Team workstation:** Any network-connected system with a compatible OPC UA client (Windows, Linux or macOS). The screenshots show Prosys OPC UA Browser as one tested example.  
 **Observed date:** 30 October 2026  
 **Server:** Native open62541 OPC UA application; HMI polls the OPC UA namespace  
@@ -21,7 +21,7 @@ The Red Team objective was to determine whether an anonymous OPC UA client could
 
 | Evidence item | What the exercise actually demonstrated |
 | --- | --- |
-| Native OPC UA communication | Prosys connected to `opc.tcp://172.24.4.26:4840`, server identified as an open62541-based OPC UA application |
+| Native OPC UA communication | Prosys connected to `opc.tcp://<ip>:4840`, server identified as an open62541-based OPC UA application |
 | Insecure access path | Security Mode `None` and `Anonymous` accepted for this deployment |
 | Engineering-data exposure | `LastApprovedWorkOrder` read as `PU-MW-0427` |
 | Unauthorised write | `MaintenanceTicket` successfully changed and read back from the server |
@@ -37,7 +37,7 @@ The Red Team objective was to determine whether an anonymous OPC UA client could
 On the Red Team machine, the relevant authorised ports are:
 
 ```bash
-nmap -Pn -sV -p 4840,8088 172.24.4.26
+nmap -Pn -sV -p 4840,8088 <ip>
 ```
 
 - TCP **4840** is the OPC UA endpoint.
@@ -45,7 +45,7 @@ nmap -Pn -sV -p 4840,8088 172.24.4.26
 
 **Why:** distinguish the industrial protocol endpoint from the operator website. The HMI is an observer; the write-capable interface in this challenge is OPC UA.
 
-Open `http://172.24.4.26:8088/` and capture the state **before** any writes. The observed baseline was `NORMAL_OPERATION`, maintenance `INACTIVE`, channel `ONLINE`, override `NOT ACCEPTED`, and data quality `GOOD`.
+Open `http://<ip>:8088/` and capture the state **before** any writes. The observed baseline was `NORMAL_OPERATION`, maintenance `INACTIVE`, channel `ONLINE`, override `NOT ACCEPTED`, and data quality `GOOD`.
 
 <!-- IMAGE SLOT 04: Operator HMI before the attack, with normal channel and telemetry quality. Replace with your own screenshot if needed. -->
 
@@ -58,7 +58,7 @@ Open `http://172.24.4.26:8088/` and capture the state **before** any writes. The
 On any compatible Red Team workstation, install an OPC UA client that supports browsing, reading and writing nodes. **Prosys OPC UA Browser** is used in the recorded screenshots, but it is not compulsory. Other OPC UA clients with equivalent functionality are suitable. Enter this server endpoint in your client:
 
 ```text
-opc.tcp://172.24.4.26:4840
+opc.tcp://<ip>:4840
 ```
 
 Choose **Security Mode: None** and **User Authentication: Anonymous**, because those options were offered by this specific lab server. Do not assume that other OPC UA deployments permit them.
@@ -245,7 +245,7 @@ After all four maintenance inputs were set, the live HMI displayed:
 From a Bash-compatible terminal with `curl` and `jq` installed (Linux, macOS, WSL, or the exercise Ubuntu VM):
 
 ```bash
-curl -sS http://172.24.4.26:8088/api/state | jq '{connected,channel_state,telemetry_quality,override_accepted,maintenance_ticket,freeze_telemetry,alarm_suppression,scenario_state,downstream_controller,southbound_protocol}'
+curl -sS http://<ip>:8088/api/state | jq '{connected,channel_state,telemetry_quality,override_accepted,maintenance_ticket,freeze_telemetry,alarm_suppression,scenario_state,downstream_controller,southbound_protocol}'
 ```
 
 The actual terminal response supplied during the exercise contained:
@@ -271,7 +271,7 @@ This is an excerpt of fields from the observed response, not an additional scree
 **Windows PowerShell alternative (no Bash or jq required):**
 
 ```powershell
-Invoke-RestMethod -Uri "http://172.24.4.26:8088/api/state" | Select-Object connected, channel_state, telemetry_quality, override_accepted, scenario_state
+Invoke-RestMethod -Uri "http://<ip>:8088/api/state" | Select-Object connected, channel_state, telemetry_quality, override_accepted, scenario_state
 ```
 
 ### 5.2 Distinguish service health from a scored operational failure
@@ -302,7 +302,7 @@ From a Bash-compatible terminal with `curl` and `jq` installed:
 
 ```bash
 for i in 1 2 3; do
-  curl -sS http://172.24.4.26:8088/api/state | jq '{active_power_mw,frequency_hz,override_accepted}'
+  curl -sS http://<ip>:8088/api/state | jq '{active_power_mw,frequency_hz,override_accepted}'
   sleep 6
 done
 ```

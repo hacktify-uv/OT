@@ -3,9 +3,9 @@
 **Challenge:** Silent Generation Bias  
 **Target controller:** `PU-GOV-PLC-02`  
 **Protocol:** Real Modbus/TCP via OpenPLC, Unit ID `1`  
-**Exercise endpoint:** `172.24.4.26:502`  
-**Operator console:** `http://172.24.4.26:8090/`  
-**Simulator:** `http://172.24.4.26:8091/health`  
+**Exercise endpoint:** `<ip>:502`  
+**Operator console:** `http://<ip>:8090/`  
+**Simulator:** `http://<ip>:8091/health`  
 **Exercise date:** 30 October 2026  
 **Scope:** Isolated, authorised OT cyber-range simulation
 
@@ -15,7 +15,7 @@
 
 The Red Team's aim is to test whether reachable Modbus/TCP clients can manipulate Unit-2's governor setpoint without application-level master authentication, creating sustained simulated electrical loading while the PLC and HMI remain available. This exercise does **not** involve real hydroelectric equipment.
 
-**Scenario 1 connection:** The previously solved OPC UA challenge revealed the engineering metadata `DownstreamController=PU-GOV-PLC-02` and `SouthboundProtocol=Modbus/TCP`. This is a genuine discovery clue; it does not by itself supply a routable address. Here, the range assigned `172.24.4.26`, and the Red Team independently confirmed the Modbus service at that address.
+**Scenario 1 connection:** The previously solved OPC UA challenge revealed the engineering metadata `DownstreamController=PU-GOV-PLC-02` and `SouthboundProtocol=Modbus/TCP`. This is a genuine discovery clue; it does not by itself supply a routable address. Here, the range assigned `<ip>`, and the Red Team independently confirmed the Modbus service at that address.
 
 The following walkthrough describes the recorded successful test. New participants should **discover register meanings through authorised engineering information and by correlating reads with the operator console** before using the solution register map below.
 
@@ -24,7 +24,7 @@ The following walkthrough describes the recorded successful test. New participan
 From the Red Team workstation, perform a narrow scan:
 
 ```bash
-nmap -Pn -sT -sV -p 502,8080,8090,8091,8443 172.24.4.26
+nmap -Pn -sT -sV -p 502,8080,8090,8091,8443 <ip>
 ```
 
 **Why:** `-Pn` avoids relying on ping; `-sT` uses a TCP connect scan; `-sV` identifies application services; `-p` limits probes to the approved range ports. No broad OT scanning or brute force is needed.
@@ -36,7 +36,7 @@ nmap -Pn -sT -sV -p 502,8080,8090,8091,8443 172.24.4.26
 Next, try the standard Nmap Modbus-discovery script:
 
 ```bash
-nmap -Pn -sT -p 502 --script modbus-discover 172.24.4.26
+nmap -Pn -sT -p 502 --script modbus-discover <ip>
 ```
 
 The running PLC returned a Modbus exception, `ILLEGAL FUNCTION` (exception `0x01`), to the discovery request. **This is not evidence that the PLC is broken**: support for one optional request does not prove support for all Modbus functions. A later FC03 holding-register read confirmed that the device was actually communicating.
@@ -45,7 +45,7 @@ The running PLC returned a Modbus exception, `ILLEGAL FUNCTION` (exception `0x01
 
 ## 3. Observe the approved baseline before touching registers
 
-Open `http://172.24.4.26:8090/` in a browser. Record the dispatch setpoint, generation, transformer and corridor loading, governor mode, command sequence and process risk. This is a **read-only** baseline step.
+Open `http://<ip>:8090/` in a browser. Record the dispatch setpoint, generation, transformer and corridor loading, governor mode, command sequence and process risk. This is a **read-only** baseline step.
 
 ![Figure 03. Baseline operator console](images/03-operator-baseline.png)
 
@@ -65,7 +65,7 @@ The HMI at the beginning of this exercise showed:
 Validate the browser values using the live JSON API, rather than assuming the UI is accurate:
 
 ```bash
-curl -sS http://172.24.4.26:8090/api/live
+curl -sS http://<ip>:8090/api/live
 ```
 
 The screenshot confirms `modbus_connected=true`, `setpoint_mw=650`, `actual_generation_mw=650`, `command_sequence=101`, `risk_state=0`.
@@ -79,14 +79,14 @@ The recorded exercise used **Netcat** to send native binary Modbus/TCP frames. T
 On **macOS** with the built-in `nc`, the successful command was:
 
 ```bash
-TARGET=172.24.4.26
+TARGET=<ip>
 printf '\x00\x01\x00\x00\x00\x06\x01\x03\x04\x00\x00\x06' | nc -G 3 -w 4 "$TARGET" 502 | hexdump -C
 ```
 
 On **Ubuntu/Linux**, replace the Netcat options with `nc -w 4 -q 1`. The exact `-G` option used above is specific to the macOS implementation and fails on the Ubuntu version used in the lab:
 
 ```bash
-TARGET=172.24.4.26
+TARGET=<ip>
 printf '\x00\x01\x00\x00\x00\x06\x01\x03\x04\x00\x00\x06' | nc -w 4 -q 1 "$TARGET" 502 | hexdump -C
 ```
 
@@ -188,7 +188,7 @@ The HMI later showed setpoint **720 MW**, actual simulated generation **720 MW**
 Confirm the attack using the independent simulator-health endpoint:
 
 ```bash
-curl -sS http://172.24.4.26:8091/health
+curl -sS http://<ip>:8091/health
 ```
 
 The actual supplied result contained `scenario_state=GENERATION_BIAS_CONFIRMED`, `actual_generation_mw=720.0`, `transformer_loading_pct=98.05`, and `corridor_loading_pct=92.53`.
@@ -221,7 +221,7 @@ During the exercise, the operator console's **Intertie Coordination** panel iden
 The source also defines a read-only endpoint:
 
 ```bash
-curl -sS http://172.24.4.26:8090/api/intertie
+curl -sS http://<ip>:8090/api/intertie
 ```
 
 **What is verified:** The asset identifier and operational dependency are present in the running Scenario 2 HMI, as captured in the screenshots. **What is not verified:** DNS resolution, a routable Scenario 3 IP, a DNP3 endpoint, or authorisation to operate that endpoint. The HMI clue is not evidence of a complete network pivot. Verify the Scenario 3 deployment separately.

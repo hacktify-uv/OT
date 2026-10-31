@@ -146,24 +146,24 @@ The TCP trace showed two connections to the DNP3 maintenance listener:
 
 | Time (UTC) | Observed traffic |
 |---|---|
-| 23:18:58–23:18:59 | `10.200.0.8:49406` to `203.0.1.250:20001` |
-| 23:20:23–23:20:25 | `10.200.0.8:49408` to `203.0.1.250:20001` |
+| 23:18:58–23:18:59 | `<ip>:49406` to `<ip>:20001` |
+| 23:20:23–23:20:25 | `<ip>:49408` to `<ip>:20001` |
 
 ![TCP packets correlated with the two DNP3 switching times](images/07-pcap-tcp-timeline.png)
 
 *Evidence 08. TCP traffic to the maintenance listener coincides with both application control events. This is packet-level timing correlation, not independently decoded CROB contents.*
 
-**Attribution limitation:** `10.200.0.8` is the source address visible at this network capture point. It may be an OpenStack routing or NAT address. Do not present it as the original attacker workstation IP without corroborating network infrastructure logs.
+**Attribution limitation:** `<ip>` is the source address visible at this network capture point. It may be an OpenStack routing or NAT address. Do not present it as the original attacker workstation IP without corroborating network infrastructure logs.
 
 ## 6. Verify the legitimate DNP3 master remained healthy
 
 ```bash
 systemctl is-active prabal-dnp3-master.service
-sudo ss -tnp | grep '127.0.0.1:20000'
+sudo ss -tnp | grep '<ip>:20000'
 sudo journalctl -u prabal-dnp3-master.service   --since '-10 minutes' --no-pager | tail -30
 ```
 
-The service was `active`. The socket listing showed an established local connection to `127.0.0.1:20000`, while the journal showed continuing `PU-LDC-DNP3-MASTER-01` application polls and DNP3 responses.
+The service was `active`. The socket listing showed an established local connection to `<ip>:20000`, while the journal showed continuing `PU-LDC-DNP3-MASTER-01` application polls and DNP3 responses.
 
 ![Legitimate DNP3 master service, socket and journal activity](images/08-legitimate-master.png)
 
@@ -235,7 +235,7 @@ Record the actual nftables table after the change, and test maintenance-port rea
 sudo python3 /opt/prabal-urja/scenario3/tools/operator_restore.py   --operator "Blue Team"   --reason "Unauthorised DNP3 switching contained; restore approved River Bend topology"
 
 sleep 3
-curl -fsS http://127.0.0.1:8093/state | jq '{
+curl -fsS http://<ip>:8093/state | jq '{
   scenario_state,scenario_confirmed,breakers,metrics,alarms,last_restore
 }'
 ```
@@ -261,8 +261,8 @@ Expected, but **not yet observed**, conditions after successful recovery:
 Check the process and HMI health endpoints, the legitimate-master socket, and rerun the **deployed one-line CTF Service Availability TTP**. The older packaged `service_availability.sh` may evaluate packet-monitor health differently, so do not substitute one checker for the other without examining the exact scoring criteria.
 
 ```bash
-curl -fsS http://127.0.0.1:8093/health | jq .
-curl -fsS http://127.0.0.1:8092/api/health | jq .
+curl -fsS http://<ip>:8093/health | jq .
+curl -fsS http://<ip>:8092/api/health | jq .
 systemctl is-active prabal-dnp3-outstation.service   prabal-dnp3-master.service   prabal-riverbend-process.service   prabal-riverbend-console.service
 ```
 

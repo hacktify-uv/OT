@@ -2,7 +2,7 @@
 
 **Scenario:** Silent Generation Bias  
 **System:** `PU-GOV-PLC-02`, OpenPLC with native Modbus/TCP and pandapower process simulation  
-**Exercise host:** `172.24.4.26` (participant-facing), TCP/502, operator console TCP/8090, simulator TCP/8091  
+**Exercise host:** `<ip>` (participant-facing), TCP/502, operator console TCP/8090, simulator TCP/8091  
 **Date of exercise:** 30 October 2026  
 **Classification:** Isolated OT cyber-range exercise  
 **Method:** Evidence-first incident response, operational recovery without hardening
@@ -31,7 +31,7 @@ During the Red Team exercise, a remote Modbus/TCP client used function code `06`
 Run the following on the **Scenario 2 Ubuntu host** to capture the current process state. It is a read-only API call.
 
 ```bash
-curl -sS http://127.0.0.1:8091/health | jq '{asset,setpoint_mw,actual_generation_mw,transformer_loading_pct,corridor_loading_pct,risk_state,scenario_state,modbus_connected}'
+curl -sS http://<ip>:8091/health | jq '{asset,setpoint_mw,actual_generation_mw,transformer_loading_pct,corridor_loading_pct,risk_state,scenario_state,modbus_connected}'
 ```
 
 **Reason:** It confirms whether the PLC is linked, what dispatch is commanded, how much generation the simulator actually calculates, and whether the application has declared the attack condition. In the captured evidence, `setpoint_mw=720`, `actual_generation_mw=720`, `transformer_loading_pct=98.05`, `corridor_loading_pct=92.53`, `risk_state=2`, `scenario_state=GENERATION_BIAS_CONFIRMED`, and `modbus_connected=true`.
@@ -131,17 +131,17 @@ Isolate remote function code `06` writes directed to Modbus TCP/502:
 for f in /var/log/prabal-urja-s02/pcap/*.pcap; do
   [ -f "$f" ] || continue
   sudo tshark -r "$f" \
-    -Y 'tcp.dstport == 502 && modbus.func_code == 6 && ip.src != 127.0.0.1' \
+    -Y 'tcp.dstport == 502 && modbus.func_code == 6 && ip.src != <ip>' \
     -T fields -e frame.time -e ip.src -e ip.dst \
     -e modbus.reference_num -e modbus.regval_uint16 2>/dev/null
 done
 ```
 
-**Observed network evidence:** Five external FC06 requests are visible in the shared capture output. They originate from `10.200.0.8`, target `203.0.1.250`, and write registers `1024` and `1029`. These addresses reflect the capture vantage point. The participant-facing server address was `172.24.4.26`; a network translation or overlay may explain the difference, but no network mapping was supplied to prove it.
+**Observed network evidence:** Five external FC06 requests are visible in the shared capture output. They originate from `<ip>`, target `<ip>`, and write registers `1024` and `1029`. These addresses reflect the capture vantage point. The participant-facing server address was `<ip>`; a network translation or overlay may explain the difference, but no network mapping was supplied to prove it.
 
 ![FIGURE 08 - Remote Modbus FC06 writes and source IP](images/09-remote-fc06-requests.png)
 
-**Attribution:** `10.200.0.8` is confirmed as the **observed source IP of the remote Modbus writes**. The identity of the person/workstation behind it is not independently verified. The `modbus.regval_uint16` field was blank in that extraction, so values are established by the event log and HMI, not claimed as directly decoded from this PCAP output.
+**Attribution:** `<ip>` is confirmed as the **observed source IP of the remote Modbus writes**. The identity of the person/workstation behind it is not independently verified. The `modbus.regval_uint16` field was blank in that extraction, so values are established by the event log and HMI, not claimed as directly decoded from this PCAP output.
 
 ## 7. Restore the approved 650 MW dispatch
 
@@ -151,10 +151,10 @@ The provided recovery screenshot shows a native Modbus function code 03 read fol
 
 ```bash
 # Read register state before a recovery write
-printf '\x00\x0c\x00\x00\x00\x06\x01\x03\x04\x00\x00\x06' | nc -w 4 -q 1 127.0.0.1 502 | hexdump -C
+printf '\x00\x0c\x00\x00\x00\x06\x01\x03\x04\x00\x00\x06' | nc -w 4 -q 1 <ip> 502 | hexdump -C
 
 # In this recorded run, restore generator setpoint register 1024 to decimal 650
-printf '\x00\x0a\x00\x00\x00\x06\x01\x06\x04\x00\x02\x8a' | nc -w 4 -q 1 127.0.0.1 502 | hexdump -C
+printf '\x00\x0a\x00\x00\x00\x06\x01\x06\x04\x00\x02\x8a' | nc -w 4 -q 1 <ip> 502 | hexdump -C
 ```
 
 **Reason:** The first read checks the live PLC baseline. The second sends a real Modbus Write Single Register request. Its echoed reply and subsequent process state support that the setpoint write took effect. These literal frames are evidence of this specific exercise; in a new run, verify the current register map and command state first.
@@ -189,7 +189,7 @@ Run the **corrected** Scenario 2 Service Availability TTP through the CTF platfo
 
 ```bash
 # Read-only final process confirmation
-curl -sS http://127.0.0.1:8091/health | jq '{setpoint_mw,actual_generation_mw,transformer_loading_pct,corridor_loading_pct,risk_state,scenario_state}'
+curl -sS http://<ip>:8091/health | jq '{setpoint_mw,actual_generation_mw,transformer_loading_pct,corridor_loading_pct,risk_state,scenario_state}'
 ```
 
 <!-- IMAGE PLACEHOLDER 11: Add screenshot of the final corrected TTP output showing SERVICE_STATUS:UP and exit code 0. Suggested filename: images/12-final-ttp-up.png -->
@@ -202,6 +202,6 @@ curl -sS http://127.0.0.1:8091/health | jq '{setpoint_mw,actual_generation_mw,tr
 
 **Verified:** OpenPLC and simulator functioning; Red Team's external FC06 write requests; application event chronology; sustained overload; evidence collection; 650 MW recovery; normal process/console values at end.
 
-**Not verified:** Final scoring TTP return to `UP`; real-world operator identity behind `10.200.0.8`; native interconnection to Scenario 3. The console displays River Bend RTU identifier `PU-RB-RTU-07`, but that does not prove that the DNP3 endpoint is reachable.
+**Not verified:** Final scoring TTP return to `UP`; real-world operator identity behind `<ip>`; native interconnection to Scenario 3. The console displays River Bend RTU identifier `PU-RB-RTU-07`, but that does not prove that the DNP3 endpoint is reachable.
 
 **Exercise recovery scope:** No hardening, allowlist, firewall change, or challenge reset is included, per exercise requirements. This makes the simulated attack repeatable; it is not a recommended production incident-response stopping point.

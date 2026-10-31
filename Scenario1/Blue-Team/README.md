@@ -3,7 +3,7 @@
 **Challenge:** The Trusted Maintenance Window  
 **Evidence date:** 30 October 2026  
 **Affected asset:** `PU-OPCUA-GW-01`, Unit 2  
-**Exercise server:** `172.24.4.26`  
+**Exercise server:** `<ip>`  
 **Scope:** Investigate the demonstrated OPC UA telemetry-integrity incident, preserve the evidence, restore the normal application state and validate the CTF scoring check. This procedure does not alter the challenge's persistent access configuration.
 
 ## 1. Incident summary
@@ -17,7 +17,7 @@ The Red Team connected to a real open62541 OPC UA server and modified maintenanc
 Run on the Ubuntu challenge host:
 
 ```bash
-curl -sS http://127.0.0.1:8088/api/state | jq '{channel_state,telemetry_quality,maintenance_mode,freeze_telemetry,alarm_suppression,maintenance_ticket,override_accepted,scenario_state}'
+curl -sS http://<ip>:8088/api/state | jq '{channel_state,telemetry_quality,maintenance_mode,freeze_telemetry,alarm_suppression,maintenance_ticket,override_accepted,scenario_state}'
 ```
 
 The captured response showed:
@@ -126,7 +126,7 @@ Review historical sessions during the **write times**:
 sudo journalctl -u prabal-opcua.service --utc --since '2026-10-30 09:10:00 UTC' --until '2026-10-30 09:21:00 UTC' --no-pager | grep -E 'Connection opened|Session created|ActivateSession|SecurityPolicy'
 ```
 
-The provided journal excerpt at **09:15:19 UTC** shows a connection from `127.0.0.1` and a `Pure Python Async Client Session1`. This is a local session, not proof of the attacker. A later socket snapshot showed a connection from `10.200.0.8`, but that snapshot was taken after the malicious writes. Neither observation establishes who performed the writes. Historical packet analysis would be needed for stronger attribution.
+The provided journal excerpt at **09:15:19 UTC** shows a connection from `<ip>` and a `Pure Python Async Client Session1`. This is a local session, not proof of the attacker. A later socket snapshot showed a connection from `<ip>`, but that snapshot was taken after the malicious writes. Neither observation establishes who performed the writes. Historical packet analysis would be needed for stronger attribution.
 
 ![Figure 07: existing sessions, attribution inconclusive](images/07-network-sessions.png)
 
@@ -156,15 +156,15 @@ Do not restart the host or use the exercise reset script merely to clear the inc
 ## 9. Confirm recovery and scoring
 
 ```bash
-curl -sS http://127.0.0.1:8088/api/state | jq '{channel_state,telemetry_quality,maintenance_mode,freeze_telemetry,alarm_suppression,maintenance_ticket,override_accepted,scenario_state}'
+curl -sS http://<ip>:8088/api/state | jq '{channel_state,telemetry_quality,maintenance_mode,freeze_telemetry,alarm_suppression,maintenance_ticket,override_accepted,scenario_state}'
 ```
 
 Expect `ONLINE`, `GOOD`, the three Boolean maintenance controls `false`, the ticket empty, `override_accepted=false`, and `NORMAL_OPERATION`. Check that power starts changing again:
 
 ```bash
-curl -sS http://127.0.0.1:8088/api/state | jq '.active_power_mw'
+curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 sleep 8
-curl -sS http://127.0.0.1:8088/api/state | jq '.active_power_mw'
+curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 ```
 
 Finally rerun the corrected **Service Availability TTP** from the CTF dashboard. Expected after recovery:
