@@ -184,9 +184,3 @@ The original distributed TTP evaluated the native MMS read together with the ind
 | Final scorer | `SERVICE_STATUS:DOWN` | Lab's attack-impact condition satisfied |
 
 **Do not treat group 2 alone as proven protection failure.** The final fault test is the independent proof. Likewise, a `DOWN` result caused only by an MMS process outage is not proof of setting-group manipulation.
-
-## 9. Root cause and security significance
-
-The lab server's `active_changed` callback accepts setting-group values 1 or 2, but does not inspect an approved engineering-change ticket, role, time window or authorised source identity. Its SCL configuration declares two groups with `actSG="1"` as the initial approved group. This is a **weak engineering change-authorisation design**, not a protocol parsing flaw. Write attempts using an inconsistent MMS type were correctly rejected, while the syntactically valid but unauthorised group change succeeded.
-
-For a production analogue, protection-engineering accounts should have independent authorisation and approved-change tracking; the security-monitoring stack should collect who/what initiated a change, the IED, before/after group, timestamp, and measured process consequence. Network filtering and MMS encryption, if available, are supporting controls, not substitutes for change approval.

@@ -230,24 +230,3 @@ The logical-node search provides a compact visual hint for Scenario 05 without a
 ![R28 - SCL IED and logical node identification](images/R28-SCL-Logical-Node-Grep.png)
 
 **Handoff limitation:** The supplied SCL contains no `<Communication>` section, device IP address, credentials or route to Scenario 05. It is a **realistic asset-discovery clue**, not a network pivot.
-
-### 10. Evidence standard and outcome
-
-| Question | Finding | Confidence |
-|---|---|---|
-| Was the bounded experiment accepted? | Yes, HTTP `202 STARTED` | Directly observed |
-| Did the runner report APCI changes? | Yes, 18 modified frames in its tail | Runner-reported |
-| Was the native IEC-104 master affected? | Yes, disconnected and telemetry stale | HMI and SOC logs |
-| Did the availability checker show DOWN? | Yes, in the earlier live scoring test | Operator-observed; screenshot pending |
-| Was a modified `N(S)` independently seen at the master? | Not in the preserved defender PCAPs | **Not independently proven** |
-| Did the Scenario 05 handoff work? | Yes, SCL engineering file downloaded | Directly observed |
-
-**Conclusion:** In the isolated training range, the fixed gateway-triggered APCI experiment was followed by genuine IEC-104 telemetry loss, master disconnections and recovery after the test ended. The engineering project provided the Scenario 05 asset clue. The package demonstrates **contained lab impact**, not acquisition of an attacker-controlled network position from the Mac.
-
-### Notes for the instructor / handover
-
-- The participant uses the **Mac/VPN commands above**. Preparing the attack virtual environment or installing the helper service is **administrator work**, not a Red Team exploit step.
-- Fresh-install `setup.sh` must install the APCI dependencies, gateway service and configured VPN allowlist. The prior live environment needed manual dependency preparation. Syntax-only validation is insufficient.
-- Do not publish the gateway externally, expose arbitrary command arguments or claim it represents a production IEC-104 weakness.
-
----

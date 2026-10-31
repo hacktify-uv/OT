@@ -330,15 +330,3 @@ The page described the ownership record as verified against a live master heartb
 ![Figure 10. Verified Control Authority record identifying the dispatch centre and related telecontrol standard.](images/10-control-authority-register.png)
 
 *Figure 10. Verified Control Authority record identifying the dispatch centre and related telecontrol standard.*
-
-## 11. Root cause and significance
-
-The successful test depended on three concrete conditions present in this challenge:
-
-1. **Reachable maintenance access.** The outstation's maintenance DNP3 listener was accessible on TCP `20001` from the participant's assigned network position.
-2. **Discoverable engineering information.** The website disclosed `/static/engineering.json` through `/robots.txt`. That document mapped equipment to protocol addresses and point indices.
-3. **Insufficient caller authorisation for switching.** An independent client using the configured master address `2` could issue CROB controls that the outstation accepted and the simulator applied, even though the process record marked the source unauthorised.
-
-The exploit did **not** depend on SQL injection, operating-system access, or a defect in `dnp3ctl`. The client performed ordinary DNP3 operations. The security failure was the acceptance of those control requests from the wrong control source.
-
-**Observed outcome:** Two genuine DNP3 SBO commands changed the simulated breaker lineup, moved the load to Feeder B, produced loading alarms and satisfied the CTF's attack condition. The operator console then provided the evidence needed to continue the broader investigation towards Northern Load Dispatch Centre.

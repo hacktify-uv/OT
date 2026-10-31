@@ -223,13 +223,3 @@ curl -sS http://<ip>:8090/api/intertie
 ```
 
 **What is verified:** The asset identifier and operational dependency are present in the running Scenario 2 HMI, as captured in the screenshots. **What is not verified:** DNS resolution, a routable Scenario 3 IP, a DNP3 endpoint, or authorisation to operate that endpoint. The HMI clue is not evidence of a complete network pivot. Verify the Scenario 3 deployment separately.
-
-## 10. Technical interpretation and limits
-
-**Vulnerability demonstrated:** The exposed OpenPLC-backed Modbus/TCP interface accepted remote FC06 write requests to the governor command registers without an authenticated-master identity check. These writes changed the simulation's setpoint; its process model calculated the consequent grid loading. The weakness is in the intentionally vulnerable **lab control path**, not a claim about a real utility.
-
-**MITRE ATT&CK for ICS mapping:** `T0836` Modify Parameter; `T0831` Manipulation of Control; `T1692.001` Unauthorized Message: Command Message (as observed in the isolated environment). The Nmap activity provides recon context, not proof of a second exploitation method.
-
-**Still separate from Scenario 1:** The matching asset identity establishes the intended dependency, but this demonstration does not prove the two scenarios share one coupled power-flow simulation. The Scenario 3 asset clue is genuinely visible, but native DNP3 reachability remains untested. Neither missing link is presented as verified.
-
-**Rules of engagement:** Use only approved isolated OT test assets. No indiscriminate flooding, service destruction, random feedback-register writes, operating-limit exceedance, or unauthorised pivot to Scenario 3.

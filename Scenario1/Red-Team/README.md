@@ -320,12 +320,3 @@ sudo bash /opt/prabal-urja/scenario1/tools/collect_evidence.sh
 The collector exports journals, `opcua-audit.log`, `process-actual.log`, available packet captures and checksums to a timestamped archive under `/var/tmp/prabal-s01-evidence-*` by default.
 
 After recovery, rerun the updated scoring TTP. Expect `SERVICE_STATUS:UP` with exit code `0` if the scenario has truly returned to normal and both services pass their protocol checks.
-
-## 8. Technical explanation for the assessor
-
-The actor did not exploit a browser flaw, crash a server or execute code on the Ubuntu host. The actor used a **real, anonymous OPC UA session** to browse the native open62541 namespace, read an approved maintenance reference, and write server-exposed control variables. The application accepted the maintenance combination, changed the telemetry channel state, inhibited alarm presentation and reported the unauthorised override through the HMI and `/api/state`.
-
-**Root cause in the lab build:** the industrial application exposes sensitive maintenance writes to an unauthenticated client and treats a readable work-order reference as adequate authorisation. The protocol itself is functioning; the application-level access-control design is defective.
-
-**What is proven:** native OPC UA access, successful anonymous maintenance writes, accepted override, degraded operator view state, working score-detection predicate.  
-**What remains to prove:** time-aligned actual-versus-displayed telemetry divergence, Blue Team restoration with `UP` scoring, and end-to-end Scenario 2 Modbus connectivity.
