@@ -1,0 +1,21 @@
+id: OT-PrabalUrja-SilentGenerationBias-Setup
+name: OT-PrabalUrja-SilentGenerationBias-Setup
+
+description: >
+  Sets up the Prabal Urja Scenario 2 training environment:
+  OpenPLC Modbus/TCP governor controller, generation process simulator and operator console.
+
+tactic: execution
+technique_id: T1059
+technique_name: Command and Scripting Interpreter
+sub_technique: None
+
+tag: red
+service_availability_id: 6eedb7ba-3cc0-4fc1-a55d-8c0c438667fe
+
+executors:
+  - name: sh
+    platform: linux
+    command: echo 'Setup Successful'
+    payloads: []
+    parsers: []

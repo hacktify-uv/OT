@@ -1,0 +1,19 @@
+id: 8f32188e-7fc2-4b15-90a4-0f839e2e4f02
+name: OT-PrabalUrja-TrustedMaintenanceWindow-ServiceAvailability
+description: >
+  Checks real OPC UA and HMI services and application state. Reports DOWN
+  when maintenance-override attack succeeds, or if services are unhealthy.
+  Reports UP only during normal operation.
+tactic: execution
+technique_id: T0853
+technique_name: Scripting
+sub_technique: N/A
+tag: service-availability
+executors:
+  - name: sh
+    platform: linux
+    command: |
+      down() { echo "SERVICE_STATUS:DOWN | REASON:$1"; exit 1; }; ENV_FILE=/etc/prabal-urja/scenario1.env; [ -r "$ENV_FILE" ] || down ENV_FILE_MISSING; . "$ENV_FILE"; [ -n "${OPCUA_PORT:-}" ] || down OPCUA_PORT_MISSING; [ -n "${HMI_PORT:-}" ] || down HMI_PORT_MISSING; command -v jq >/dev/null 2>&1 || down JQ_MISSING; command -v curl >/dev/null 2>&1 || down CURL_MISSING; systemctl is-active --quiet prabal-opcua.service || down OPCUA_SERVICE_INACTIVE; systemctl is-active --quiet prabal-hmi.service || down HMI_SERVICE_INACTIVE; ss -ltn 2>/dev/null | grep -Eq ":${OPCUA_PORT}[[:space:]]" || down OPCUA_PORT_DOWN; ss -ltn 2>/dev/null | grep -Eq ":${HMI_PORT}[[:space:]]" || down HMI_PORT_DOWN; OPC_JSON=$(/opt/prabal-urja/scenario1/venv/bin/python /opt/prabal-urja/scenario1/tools/opcua_probe.py --endpoint "opc.tcp://127.0.0.1:${OPCUA_PORT}" --timeout 4 2>/dev/null) || down OPCUA_PROBE_FAILED; printf "%s\n" "$OPC_JSON" | jq -e ' .status == "up" and .server_ready == true and (.scenario_state | type == "string") ' >/dev/null 2>&1 || down OPCUA_UNHEALTHY; HMI_HEALTH=$(curl -fsS --connect-timeout 3 --max-time 6 "http://127.0.0.1:${HMI_PORT}/api/health" 2>/dev/null) || down HMI_HEALTH_FAILED; printf "%s\n" "$HMI_HEALTH" | jq -e ' .status == "up" and .opcua_connected == true ' >/dev/null 2>&1 || down HMI_UNHEALTHY; STATE=$(curl -fsS --connect-timeout 3 --max-time 6 "http://127.0.0.1:${HMI_PORT}/api/state" 2>/dev/null) || down HMI_STATE_UNAVAILABLE; printf "%s\n" "$STATE" | jq -e ' .connected == true and (.scenario_state | type == "string") ' >/dev/null 2>&1 || down HMI_DISCONNECTED; if printf "%s\n" "$OPC_JSON" | jq -e '.scenario_state == "UNAUTHORISED_MAINTENANCE_OVERRIDE"' >/dev/null 2>&1; then down ATTACK_DETECTED_OPCUA; fi; if printf "%s\n" "$STATE" | jq -e '.override_accepted == true or .scenario_state == "UNAUTHORISED_MAINTENANCE_OVERRIDE" or .channel_state == "MAINTENANCE_HOLD" or .telemetry_quality == "UNCERTAIN_LAST_USABLE_VALUE"' >/dev/null 2>&1; then down ATTACK_DETECTED_TELEMETRY_COMPROMISED; fi; printf "%s\n" "$OPC_JSON" | jq -e '.scenario_state == "NORMAL_OPERATION"' >/dev/null 2>&1 || down OPCUA_UNEXPECTED_STATE; printf "%s\n" "$STATE" | jq -e '.scenario_state == "NORMAL_OPERATION"' >/dev/null 2>&1 || down HMI_UNEXPECTED_STATE; echo "SERVICE_STATUS:UP | REASON:NORMAL_OPERATION | OPCUA_PROBE:PASS | HMI_PROBE:PASS"; exit 0
+    payloads: []
+    parsers: []
+ 

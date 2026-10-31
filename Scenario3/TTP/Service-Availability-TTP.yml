@@ -1,0 +1,18 @@
+id: OT-PrabalUrja-RogueDNP3Master-RvB-ServiceAvailability
+name: OT-RogueDNP3Master-RvB-ServiceAvailability
+description: >
+  Inline CTF integrity check. Reports UP for normal switching and DOWN for
+  successful rogue DNP3 switching or essential component failure.
+  A degraded independent packet monitor is reported but does not count as a successful attack.
+tactic: discovery
+technique_id: T0846
+technique_name: Remote System Discovery
+sub_technique: ""
+tag: service-availability
+executors:
+  - name: sh
+    platform: linux
+    command: >-
+      down(){ printf 'SERVICE_STATUS:DOWN | REASON:%s\n' "$1"; exit 1; }; for C in systemctl ss curl jq timeout; do command -v "$C" >/dev/null 2>&1 || down "MISSING_DEPENDENCY:$C"; done; for S in prabal-dnp3-outstation.service prabal-dnp3-master.service prabal-riverbend-process.service prabal-riverbend-console.service; do systemctl is-active --quiet "$S" || down "SERVICE_INACTIVE:$S"; done; for P in 20000 20001 8092 8093; do ss -ltn | awk '{print $4}' | grep -Eq "(^|:)${P}$" || down "PORT_CLOSED:$P"; done; H=$(curl -fsS --max-time 5 http://127.0.0.1:8093/health) || down PROCESS_API_UNAVAILABLE; printf '%s\n' "$H" | jq -e '.status=="UP" and .heartbeat_age_seconds<=3' >/dev/null 2>&1 || down PROCESS_HEALTH_FAILED; J=$(curl -fsS --max-time 5 http://127.0.0.1:8092/api/health) || down CONSOLE_API_UNAVAILABLE; printf '%s\n' "$J" | jq -e '.status=="UP" and .process_current==true' >/dev/null 2>&1 || down CONSOLE_HEALTH_FAILED; X=$(curl -fsS --max-time 5 http://127.0.0.1:8093/state) || down PROCESS_STATE_UNAVAILABLE; printf '%s\n' "$X" | jq -e '.scenario_confirmed==true or .scenario_state=="ROGUE_MASTER_SWITCHING_CONFIRMED"' >/dev/null 2>&1 && down ROGUE_MASTER_ATTACK_CONFIRMED; printf '%s\n' "$X" | jq -e '.scenario_confirmed==false and .scenario_state=="NORMAL_SWITCHING_CONFIGURATION" and .breakers.feeder_a_closed==true and .breakers.bus_tie_closed==false and .breakers.feeder_b_closed==true and .alarms.corridor_overload==false and .alarms.transformer_overload==false and .alarms.low_bus_voltage==false and .alarms.load_loss==false' >/dev/null 2>&1 || down PROCESS_CONFIGURATION_UNSAFE; [ -x /opt/prabal-urja/scenario3/bin/prabal-dnp3-command ] || down DNP3_SCAN_BINARY_MISSING; D=$(timeout 20 /opt/prabal-urja/scenario3/bin/prabal-dnp3-command --host 127.0.0.1 --port 20001 --master 2 --outstation 10 --action scan 2>&1) || down DNP3_PROTOCOL_PROBE_FAILED; printf '%s\n' "$D" | grep -q SCAN_COMPLETED || down DNP3_SCAN_INCOMPLETE; ss -tn state established | grep -Eq '127\.0\.0\.1:20000' || down LEGITIMATE_MASTER_DISCONNECTED; journalctl -u prabal-dnp3-master.service --since '-5 minutes' --no-pager 2>/dev/null | grep -q LEGITIMATE_MASTER_DATA || down LEGITIMATE_MASTER_STALE; M=DEGRADED; MH=$(curl -sS --max-time 5 http://127.0.0.1:8094/health 2>/dev/null || true); if systemctl is-active --quiet prabal-dnp3-command-monitor.service && printf '%s\n' "$MH" | jq -e '.status=="UP" and .tshark_alive==true' >/dev/null 2>&1; then M=UP; fi; printf 'SERVICE_STATUS:UP | REASON:NORMAL_SWITCHING_CONFIGURATION | DNP3:PASS | PROCESS:PASS | HMI:PASS | LEGITIMATE_MASTER:PASS | MONITOR:%s\n' "$M"; exit 0
+    payloads: []
+    parsers: []

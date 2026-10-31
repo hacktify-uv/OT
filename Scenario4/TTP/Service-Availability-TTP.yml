@@ -1,0 +1,14 @@
+id: OT-PrabalUrja-IEC104TelecontrolIntegrity-ServiceAvailability
+name: OT-IEC104TelecontrolIntegrity-ServiceAvailability
+description: Checks live IEC104 master telemetry freshness against the healthy remote station; does not attribute session poisoning without packet evidence.
+tactic: discovery
+technique_id: T0846
+technique_name: Remote System Discovery
+sub_technique: ''
+tag: service-availability
+executors:
+- name: sh
+  platform: linux
+  command: python3 -c 'import json,urllib.request,sys;u=lambda x:json.load(urllib.request.urlopen("http://127.0.0.1:8095"+x,timeout=4));a=u("/api/state");b=u("/api/incident");d=(a.get("telecontrol_online") is not True or a.get("scenario_state")!="DISPATCH_TELECONTROL_HEALTHY" or (b.get("status")=="RECORDED" and b.get("record_type")=="observed_live_telemetry_loss"));print("SERVICE_STATUS:"+("DOWN" if d else "UP"));sys.exit(int(d))'
+  payloads: []
+  parsers: []

@@ -1,0 +1,21 @@
+id: OT-PrabalUrja-TrustedMaintenanceWindow-Setup
+name: OT-PrabalUrja-TrustedMaintenanceWindow-Setup
+
+description: >
+  Sets up the Prabal Urja Scenario 1 training environment:
+  OPC UA telemetry gateway and operator HMI with maintenance controls for telemetry freezing and alarm suppression.
+
+tactic: execution
+technique_id: T1059
+technique_name: Command and Scripting Interpreter
+sub_technique: None
+
+tag: red
+service_availability_id: 8f32188e-7fc2-4b15-90a4-0f839e2e4f02
+
+executors:
+  - name: sh
+    platform: linux
+    command: echo 'Setup Successful'
+    payloads: []
+    parsers: []

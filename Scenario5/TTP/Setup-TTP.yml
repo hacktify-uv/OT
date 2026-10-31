@@ -1,0 +1,21 @@
+id: OT-PrabalUrja-NativeMMSProtection-Setup
+name: OT-PrabalUrja-NativeMMSProtection-Setup
+
+description: >
+  Sets up the Prabal Urja Scenario 5 training environment:
+  Native IEC 61850 MMS IED, protection setting groups and simulated operator interface.
+
+tactic: execution
+technique_id: T1059
+technique_name: Command and Scripting Interpreter
+sub_technique: None
+
+tag: red
+service_availability_id: Prabal-Urja-S05-Service-Availability
+
+executors:
+  - name: sh
+    platform: linux
+    command: echo 'Setup Successful'
+    payloads: []
+    parsers: []

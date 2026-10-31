@@ -1,0 +1,21 @@
+id: OT-PrabalUrja-RogueDNP3Master-Setup
+name: OT-PrabalUrja-RogueDNP3Master-Setup
+
+description: >
+  Sets up the Prabal Urja Scenario 3 training environment:
+  DNP3 master and outstation, River Bend switching simulator and operator console.
+
+tactic: execution
+technique_id: T1059
+technique_name: Command and Scripting Interpreter
+sub_technique: None
+
+tag: red
+service_availability_id: OT-PrabalUrja-RogueDNP3Master-RvB-ServiceAvailability
+
+executors:
+  - name: sh
+    platform: linux
+    command: echo 'Setup Successful'
+    payloads: []
+    parsers: []

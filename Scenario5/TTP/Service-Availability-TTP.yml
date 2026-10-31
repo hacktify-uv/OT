@@ -1,0 +1,19 @@
+id: Prabal-Urja-S05-Service-Availability
+name: OT-S05-Native-MMS-Protection
+description: Checks native MMS connectivity and actual protection failure after the instructor fault test.
+tactic: impact
+technique_id: T0832
+technique_name: Manipulation of Control
+tag: service-availability
+
+executors:
+- name: sh
+  platform: linux
+  command: f=/var/lib/prabal-urja/scenario5/relay-state.json; o=$(timeout 8 /opt/prabal-urja/scenario5/bin/pu_s05_mms_client 127.0.0.1 102 2>/dev/null); r=$?; if [ "$r" -ne 0 ] || ! printf "%s" "$o" | grep -q "^MMS_READ_OK"; then echo "SERVICE_STATUS:DOWN | REASON:NATIVE_MMS_PROBE_FAILED"; exit 1; elif ! jq -e . "$f" >/dev/null 2>&1; then echo "SERVICE_STATUS:DOWN | REASON:IED_STATE_UNAVAILABLE"; exit 1; elif jq -e "(.active_setting_group == 2) and (.last_test_current_amps > 800) and (.last_test_group == 2) and (.last_test_trip == false) and (.breaker_closed == true)" "$f" >/dev/null 2>&1; then echo "SERVICE_STATUS:DOWN | REASON:PROTECTION_RESPONSE_SUPPRESSED"; exit 1; else echo "SERVICE_STATUS:UP | REASON:PROTECTION_ACTIVE"; exit 0; fi
+    f=/var/lib/prabal-urja/scenario5/relay-state.json;
+    if ! timeout 8 /opt/prabal-urja/scenario5/bin/pu_s05_mms_client 127.0.0.1 102 2>/dev/null | grep -q '^MMS_READ_OK'; then echo 'SERVICE_STATUS:DOWN | REASON:NATIVE_MMS_PROBE_FAILED'; exit 1; fi;
+    if ! jq -e --argjson now "$(date +%s)" '(.epoch | type) == "number" and ($now - .epoch >= 0) and ($now - .epoch < 5)' "$f" >/dev/null 2>&1; then echo 'SERVICE_STATUS:DOWN | REASON:IED_STATE_MISSING_OR_STALE'; exit 1; fi;
+    if jq -e '(.last_test_current_amps // 0) > 800 and .last_test_group == 2 and .last_test_trip == false' "$f" >/dev/null 2>&1; then echo 'SERVICE_STATUS:DOWN | REASON:PROTECTION_RESPONSE_SUPPRESSED'; exit 1; fi;
+    echo 'SERVICE_STATUS:UP | REASON:PROTECTION_ACTIVE'; exit 0
+  payloads: []
+  parsers: []

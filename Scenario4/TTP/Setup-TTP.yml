@@ -1,0 +1,21 @@
+id: OT-PrabalUrja-IEC104TelecontrolIntegrity-Setup
+name: OT-PrabalUrja-IEC104TelecontrolIntegrity-Setup
+
+description: >
+  Sets up the Prabal Urja Scenario 4 training environment:
+  Native IEC-104 master and outstation, dispatch telemetry simulator and bounded participant experiment gateway.
+
+tactic: execution
+technique_id: T1059
+technique_name: Command and Scripting Interpreter
+sub_technique: None
+
+tag: red
+service_availability_id: OT-PrabalUrja-IEC104TelecontrolIntegrity-ServiceAvailability
+
+executors:
+  - name: sh
+    platform: linux
+    command: echo 'Setup Successful'
+    payloads: []
+    parsers: []

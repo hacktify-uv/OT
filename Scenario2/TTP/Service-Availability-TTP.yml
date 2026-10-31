@@ -1,0 +1,22 @@
+id: 6eedb7ba-3cc0-4fc1-a55d-8c0c438667fe
+name: OT-PrabalUrja-SilentGenerationBias-ServiceAvailability
+description: >
+  Checks systemd, listening ports, real Modbus/TCP reads, pandapower simulator
+  health and operator-console health. Reports DOWN when the simulator records
+  GENERATION_BIAS_CONFIRMED, even when services remain available.
+  Reports UP for normal dispatch and for a bias still developing, until the
+  process-impact win condition is confirmed. A separate run after Blue Team
+  restoration should report UP once NORMAL_DISPATCH is restored.
+tactic: execution
+technique_id: T0853
+technique_name: Scripting
+sub_technique: N/A
+tag: service-availability
+executors:
+  - name: sh
+    platform: linux
+    command: |
+      fail(){ echo "SERVICE_STATUS:DOWN | REASON:$1"; exit 1; }; ENV_FILE=/etc/prabal-urja/scenario2.env; [ -r "$ENV_FILE" ] || fail ENV_FILE_MISSING; . "$ENV_FILE"; [ -n "${MODBUS_PORT:-}" ] || fail MODBUS_PORT_MISSING; [ -n "${OPENPLC_WEB_PORT:-}" ] || fail OPENPLC_WEB_PORT_MISSING; [ -n "${GRID_HEALTH_PORT:-}" ] || fail GRID_HEALTH_PORT_MISSING; [ -n "${HMI_PORT:-}" ] || fail HMI_PORT_MISSING; command -v curl >/dev/null 2>&1 || fail CURL_MISSING; command -v jq >/dev/null 2>&1 || fail JQ_MISSING; command -v ss >/dev/null 2>&1 || fail SS_MISSING; for SVC in prabal-openplc.service prabal-grid-simulator.service prabal-operator-console.service; do systemctl is-active --quiet "$SVC" || fail "SERVICE_INACTIVE:$SVC"; done; CAP_SVC=$(systemctl is-active prabal-modbus-capture.service 2>/dev/null || true); for P in "$MODBUS_PORT" "$OPENPLC_WEB_PORT" "$GRID_HEALTH_PORT" "$HMI_PORT"; do ss -ltn 2>/dev/null | grep -Eq ":${P}[[:space:]]" || fail "LISTENER_MISSING:$P"; done; PY=/opt/prabal-urja/scenario2/venv/bin/python; PROBE=/opt/prabal-urja/scenario2/tools/modbus_probe.py; MODBUS_JSON=$("$PY" "$PROBE" --host 127.0.0.1 --port "$MODBUS_PORT" --address 1024 --count 24 2>/dev/null) || fail MODBUS_PROBE_FAILED; printf "%s\n" "$MODBUS_JSON" | jq -e '.status == "up" and .count == 24 and (.registers | length) == 24' >/dev/null 2>&1 || fail MODBUS_READ_INVALID; GRID_JSON=$(curl -fsS --connect-timeout 3 --max-time 6 "http://127.0.0.1:${GRID_HEALTH_PORT}/health" 2>/dev/null) || fail GRID_HEALTH_UNAVAILABLE; printf "%s\n" "$GRID_JSON" | jq -e '.status == "up" and .modbus_connected == true and (.actual_generation_mw | type == "number") and (.actual_generation_mw >= 500) and (.actual_generation_mw <= 750)' >/dev/null 2>&1 || fail GRID_SIMULATOR_UNHEALTHY; GRID_STATE=$(printf "%s\n" "$GRID_JSON" | jq -r '.scenario_state // "MISSING"') || fail GRID_SCENARIO_STATE_INVALID; [ "$GRID_STATE" != "GENERATION_BIAS_CONFIRMED" ] || fail GENERATION_BIAS_CONFIRMED; case "$GRID_STATE" in NORMAL_DISPATCH|GENERATION_BIAS_DEVELOPING) ;; *) fail "GRID_UNEXPECTED_STATE:$GRID_STATE";; esac; HMI_HEALTH=$(curl -fsS --connect-timeout 3 --max-time 6 "http://127.0.0.1:${HMI_PORT}/api/health" 2>/dev/null) || fail HMI_HEALTH_UNAVAILABLE; printf "%s\n" "$HMI_HEALTH" | jq -e '.status == "up" and .modbus_connected == true' >/dev/null 2>&1 || fail HMI_UNHEALTHY; WEB_CODE=$(curl -sS -o /dev/null -w "%{http_code}" --connect-timeout 3 --max-time 6 "http://127.0.0.1:${OPENPLC_WEB_PORT}/" 2>/dev/null) || fail OPENPLC_WEB_UNREACHABLE; case "$WEB_CODE" in 200|302|401|403) ;; *) fail "OPENPLC_WEB_HTTP_$WEB_CODE";; esac; echo "SERVICE_STATUS:UP | REASON:$GRID_STATE | MODBUS_PROBE:PASS | GRID_PROBE:PASS | HMI_PROBE:PASS | OPENPLC_WEB_PROBE:PASS | CAPTURE_SUPPORT:$CAP_SVC"; exit 0
+    payloads: []
+    parsers: []
+ 
