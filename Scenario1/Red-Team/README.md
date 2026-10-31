@@ -326,8 +326,3 @@ After documenting the compromise, use the same OPC UA client (or another compati
 
 Refresh `OverrideAccepted` and `Health/ScenarioState`, then refresh the HMI. Expected normal-state values are `OverrideAccepted=false` and `ScenarioState=NORMAL_OPERATION`.
 
-## Next scenario
-
-Engineering metadata identifies `PU-GOV-PLC-02` and `Modbus/TCP`, leading to the governor investigation in Scenario 2.
-
-[Continue to Scenario 2](../../Scenario2/README.md)

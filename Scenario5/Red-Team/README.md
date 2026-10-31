@@ -201,8 +201,3 @@ The original distributed TTP evaluated the native MMS read together with the ind
 
 Likewise, a `DOWN` result caused only by an MMS process outage is not proof of setting-group manipulation.
 
-## Final stage
-
-This is the final stage: relate the selected protection group to the relay response under the instructor-applied 1300 A simulated fault.
-
-[Return to the exercise overview](../../README.md)

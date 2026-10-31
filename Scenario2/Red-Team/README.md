@@ -237,8 +237,3 @@ The source also defines a read-only endpoint:
 curl -sS http://${TARGET}:8090/api/intertie
 ```
 
-## Next scenario
-
-The Intertie Coordination panel identifies River Bend RTU `PU-RB-RTU-07` and its feeder/bus-tie switching dependency, leading to Scenario 3.
-
-[Continue to Scenario 3](../../Scenario3/README.md)

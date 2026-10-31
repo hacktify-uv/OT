@@ -154,8 +154,3 @@ sleep 8
 curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 ```
 
-## Next scenario
-
-Engineering metadata identifies `PU-GOV-PLC-02` and `Modbus/TCP`, leading to the governor investigation in Scenario 2.
-
-[Continue to Scenario 2](../../Scenario2/README.md)

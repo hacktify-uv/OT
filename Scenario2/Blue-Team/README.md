@@ -165,8 +165,3 @@ The operator-console screenshot taken later shows the simulator has settled at t
 
 ![FIGURE 10 - Operator console after confirmed operational recovery](images/11-restored-operator-console.png)
 
-## Next scenario
-
-The Intertie Coordination panel identifies River Bend RTU `PU-RB-RTU-07` and its feeder/bus-tie switching dependency, leading to Scenario 3.
-
-[Continue to Scenario 3](../../Scenario3/README.md)

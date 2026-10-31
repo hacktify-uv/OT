@@ -240,8 +240,3 @@ curl -fsS http://<ip>:8092/api/health | jq .
 systemctl is-active prabal-dnp3-outstation.service   prabal-dnp3-master.service   prabal-riverbend-process.service   prabal-riverbend-console.service
 ```
 
-## Next scenario
-
-The Control Authority register identifies `PU-LDC-DNP3-MASTER-01`, Northern Load Dispatch Centre, and IEC 60870-5-104, leading to Scenario 4.
-
-[Continue to Scenario 4](../../Scenario4/README.md)

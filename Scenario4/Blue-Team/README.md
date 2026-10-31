@@ -270,8 +270,3 @@ systemctl is-active prabal-s04-participant-gateway.service
 
 ![B13 - Participant gateway stopped](images/B13-SOC-Containment.png)
 
-## Next scenario
-
-The incident-linked SCL engineering file identifies digital-substation IED `PU-DSS-IED-01` and its protection logical nodes, leading to Scenario 5.
-
-[Continue to Scenario 5](../../Scenario5/README.md)

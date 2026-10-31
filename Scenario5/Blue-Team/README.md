@@ -191,8 +191,3 @@ SERVICE_STATUS:UP | REASON:PROTECTION_ACTIVE
 
 >
 
-## Final stage
-
-This is the final stage: relate the selected protection group to the relay response under the instructor-applied 1300 A simulated fault.
-
-[Return to the exercise overview](../../README.md)

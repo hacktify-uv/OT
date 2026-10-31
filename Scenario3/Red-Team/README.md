@@ -347,8 +347,3 @@ The page described the ownership record as verified against a live master heartb
 
 *Figure 10. Verified Control Authority record identifying the dispatch centre and related telecontrol standard.*
 
-## Next scenario
-
-The Control Authority register identifies `PU-LDC-DNP3-MASTER-01`, Northern Load Dispatch Centre, and IEC 60870-5-104, leading to Scenario 4.
-
-[Continue to Scenario 4](../../Scenario4/README.md)

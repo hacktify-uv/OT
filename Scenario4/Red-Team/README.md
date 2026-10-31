@@ -246,8 +246,3 @@ The logical-node search provides a compact visual hint for Scenario 05 without a
 
 ![R28 - SCL IED and logical node identification](images/R28-SCL-Logical-Node-Grep.png)
 
-## Next scenario
-
-The incident-linked SCL engineering file identifies digital-substation IED `PU-DSS-IED-01` and its protection logical nodes, leading to Scenario 5.
-
-[Continue to Scenario 5](../../Scenario5/README.md)
