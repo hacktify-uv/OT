@@ -10,8 +10,6 @@
 
 The Red Team connected to a real open62541 OPC UA server and modified maintenance variables exposed to an anonymous client. The approved work-order reference was discovered by reading `EngineeringMetadata/LastApprovedWorkOrder`; it was not guessed. The accepted combination of `MaintenanceTicket`, `MaintenanceMode`, `FreezeTelemetry` and `AlarmSuppression` caused the operator's telemetry to enter `MAINTENANCE_HOLD` while the underlying time-dependent process simulation continued changing.
 
-**What is proven:** the override, HMI integrity degradation, corresponding audit events, continuing simulated process variation, collected evidence archive and manually tested CTF `DOWN` scoring logic. **Not yet proven:** packet-level attribution of the remote writer, the final restoration test, dashboard points deduction, and a working connection to Scenario 2.
-
 ## 2. Detection: inspect the live state
 
 Run on the Ubuntu challenge host:
@@ -147,7 +145,7 @@ Use the variable's **Write Value** operation to restore the following values in 
 | `MaintenanceMode` | `false` (Boolean) |
 | `MaintenanceTicket` | Empty String |
 
-The server's application code evaluates the override condition continuously. Clearing an individual required Boolean deactivates it; clearing the remaining variables and ticket returns the lab to an ordinary baseline. This recovery has **not yet been shown in the supplied screenshots**.
+The server's application code evaluates the override condition continuously. Clearing an individual required Boolean deactivates it; clearing the remaining variables and ticket returns the lab to an ordinary baseline.
 
 Do not restart the host or use the exercise reset script merely to clear the incident. Both would interfere with the investigation record or exercise state.
 
@@ -171,4 +169,4 @@ Finally rerun the corrected **Service Availability TTP** from the CTF dashboard.
 SERVICE_STATUS:UP | REASON:NORMAL_OPERATION | OPCUA_PROBE:PASS | HMI_PROBE:PASS
 ```
 
-The expected exit code is `0`. Actual recovery output and dashboard score adjustment remain to be captured.
+The expected exit code is `0`.

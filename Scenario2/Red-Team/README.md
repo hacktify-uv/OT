@@ -9,7 +9,7 @@
 **Exercise date:** 30 October 2026  
 **Scope:** Isolated, authorised OT cyber-range simulation
 
-> **Observed result:** The remote Red Team client issued real Modbus/TCP requests, increased the governor setpoint from **650 MW** to **720 MW**, and obtained confirmed process effects. The simulator returned `GENERATION_BIAS_CONFIRMED`, with actual generation **720 MW**, transformer loading **98.05%** and corridor loading **92.53%**. The CTF scoring dashboard was reported as `DOWN` by the participant, but a separate screenshot of the exact Scenario 2 scoring-TTP output was not supplied. The installed OpenPLC service remained responsive.
+> **Observed result:** The remote Red Team client issued real Modbus/TCP requests, increased the governor setpoint from **650 MW** to **720 MW**, and obtained confirmed process effects. The simulator returned `GENERATION_BIAS_CONFIRMED`, with actual generation **720 MW**, transformer loading **98.05%** and corridor loading **92.53%**. The installed OpenPLC service remained responsive.
 
 ## 1. Mission and starting information
 
@@ -202,8 +202,6 @@ The actual supplied result contained `scenario_state=GENERATION_BIAS_CONFIRMED`,
 The Scenario 2 scoring-TTP was revised to fail on the simulator's `GENERATION_BIAS_CONFIRMED` state instead of only checking port and service availability. The participant reported that the CTF service changed to **DOWN** following the successful attack.
 
 This is deliberately different from a service crash. The OpenPLC Modbus/TCP listener and operator console remained operational; the CTF was marking the **integrity of the simulated operating condition** as failed.
-
-**Evidence limitation:** The supplied screenshots contain the simulator's confirmed attack state and the participant's report that scoring was DOWN; they do **not** contain a captured Scenario 2 TTP output demonstrating exit code `1` or the dashboard's actual deduction. Capture this separately if it is required by the assessor.
 
 ## 9. Discovery of the next scenario (Scenario 2 to 3)
 

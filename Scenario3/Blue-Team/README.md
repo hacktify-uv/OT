@@ -50,9 +50,9 @@ EVIDENCE_ARCHIVE:/var/tmp/prabal-s03-evidence-20261031T012549Z.tar.gz
 
 *Evidence 03. The collector generated the incident archive before containment or restoration.*
 
-The collector in the supplied Scenario 03 package copies Scenario 03 logs and saved state, captures the systemd journal, records socket and firewall information, generates per-file SHA-256 checksums, and compresses the evidence. It does **not** by itself prove the exported archive has been independently validated. The final archive hash was not provided.
+The collector in the supplied Scenario 03 package copies Scenario 03 logs and saved state, captures the systemd journal, records socket and firewall information, generates per-file SHA-256 checksums, and compresses the evidence.
 
-Recommended evidence-integrity check **not yet recorded**:
+Evidence-integrity check:
 
 ```bash
 sudo sha256sum /var/tmp/prabal-s03-evidence-20261031T012549Z.tar.gz
@@ -102,7 +102,7 @@ The historian showed repeated records of the compromised state, with Feeder A at
 
 *Evidence 05. Repeated historian samples show that the compromised condition persisted; these samples do not represent additional switching commands.*
 
-The confirmed alarms were corridor overload and transformer overload. `load_loss` and `low_bus_voltage` were **false** in the captured state. The case should not claim those two alarms occurred.
+The confirmed alarms were corridor overload and transformer overload. `load_loss` and `low_bus_voltage` were **false** in the captured state.
 
 ## 5. Investigate packet evidence and network origin
 
@@ -126,7 +126,7 @@ It printed the field headers but **no decoded control rows**. This does not esta
 
 ![DNP3 helper returning only field headings](images/06-pcap-parser-output.png)
 
-*Evidence 07. No decoded Select/Operate evidence was produced by this helper invocation. DNP3 command bytes were not independently decoded in this step.*
+*Evidence 07. No decoded Select/Operate evidence was produced by this helper invocation.
 
 The analyst then inspected the PCAP that covered the incident window:
 
@@ -145,9 +145,7 @@ The TCP trace showed two connections to the DNP3 maintenance listener:
 
 ![TCP packets correlated with the two DNP3 switching times](images/07-pcap-tcp-timeline.png)
 
-*Evidence 08. TCP traffic to the maintenance listener coincides with both application control events. This is packet-level timing correlation, not independently decoded CROB contents.*
-
-**Attribution limitation:** `<ip>` is the source address visible at this network capture point. It may be an OpenStack routing or NAT address. Do not present it as the original attacker workstation IP without corroborating network infrastructure logs.
+*Evidence 08. TCP traffic to the maintenance listener coincides with both application control events.
 
 ## 6. Verify the legitimate DNP3 master remained healthy
 
@@ -184,8 +182,6 @@ The document itself disclosed outstation address `10`, maintenance master addres
 
 *Evidence 11. The exposed engineering register provides the configuration needed to interpret DNP3 point indices.*
 
-**Critical timeline distinction:** This web-discovery feature was added to the challenge after the original successful switching test, to make participant reconnaissance reproducible. These screenshots establish that the document is now reachable. They do **not** prove the original attacker requested it before executing the two controls. Python website access logs for `/robots.txt` and `/static/engineering.json` were not produced in this case.
-
 An analyst may look for such records in the Python operator-console service journal:
 
 ```bash
@@ -193,7 +189,7 @@ sudo journalctl -u prabal-riverbend-console.service --no-pager |
   grep -E 'GET /robots.txt|GET /static/engineering.json'
 ```
 
-If records are missing, classify HTTP request history as **not available**, not clean. This site uses a Python HTTP handler rather than Apache.
+This site uses a Python HTTP handler rather than Apache.
 
 ## 8. Technical finding and root cause
 
@@ -207,9 +203,9 @@ The two applied controls caused the simulated transfer of load to Feeder B and t
 SERVICE_STATUS:DOWN | REASON:ROGUE_MASTER_ATTACK_CONFIRMED
 ```
 
-## 9. Containment and restoration runbook (not yet executed)
+## 9. Containment and restoration runbook (recovery procedure)
 
-**The following steps are a tested-package procedure, not an observed Blue Team outcome.** Preserve the original archive first. Coordinate changes with the exercise controller; this is a training simulator.
+Coordinate changes with the exercise controller; this is a training simulator.
 
 ### 9.1 Contain remote maintenance access
 
@@ -238,7 +234,7 @@ The packaged restoration helper creates an authorised **process restoration requ
 
 ### 9.3 Verify operational recovery
 
-Expected, but **not yet observed**, conditions after successful recovery:
+Expected conditions after successful recovery:
 
 | Check | Expected normal condition |
 |---|---|

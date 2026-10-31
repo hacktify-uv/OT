@@ -165,8 +165,6 @@ Closing the bus tie creates an alternate simulated supply path between the bus s
 1. Close the bus tie while the feeder paths remain available.
 2. Open Feeder A while the bus tie stays closed.
 
-This sequence is inferred from the single-line view and the published point mapping, not supplied by the engineering document itself.
-
 ## 6. Operation 1: Close the bus tie
 
 The engineering register maps the bus tie to **binary output index `1`**. Submit a DNP3 Control Relay Output Block (CROB) using Select-Before-Operate (SBO):

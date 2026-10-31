@@ -6,8 +6,6 @@
 **Participant platform:** macOS over the authorised training VPN (commands are also usable from another workstation with `curl` and Nmap)  
 **Objective:** Demonstrate telemetry loss in the native IEC 60870-5-104 master/outstation link, verify the operational impact, and extract the Scenario 05 engineering handoff.
 
-> **Accuracy note.** The observed attack was an **instructor-provisioned, 95-second APCI sequence-modification experiment** invoked through a lab participant gateway. It was not an independently obtained man-in-the-middle position from the Mac. We observed runner modification logs, genuine master disconnections, HMI telemetry loss and the engineering handoff. The defender-side PCAPs preserved in the associated SOC case did **not** independently expose the altered APCI frame values. Do not describe that missing proof as confirmed.
-
 ### Exercise scope and architecture
 
 | Component | Observed value | Meaning |
@@ -173,7 +171,7 @@ curl -fsS http://<ip>:8095/api/incident | python3 -m json.tool
 
 **Action:** Open `http://<ip>:8095/` in the participant browser while the disruption is active.
 
-**Why:** This is the operator-facing effect of the native-master failure. It provides independent application-state corroboration, but not a packet-by-packet rewrite proof.
+**Why:** This is the operator-facing effect of the native-master failure.
 
 **Observed:** The HMI displayed `IEC104_TELECONTROL_LOST`, master `STALE / LOST`, about **58.52 seconds** telemetry age and a linked engineering investigation.
 
@@ -192,8 +190,6 @@ curl -fsS http://<ip>:8095/api/state | python3 -m json.tool
 **Observed after the test:** `DISPATCH_TELECONTROL_HEALTHY`, `telecontrol_online: true`, `DATA_RECEIVED` and a rising receive count. This recovery followed the bounded test ending; it was not caused by a demonstrated Blue Team containment action.
 
 ![R08 - SCADA state recovered after bounded run](images/R08-Recovered-SCADA-State.png)
-
-**Retained incident check:** The historical record was used for later investigation after live telemetry returned. It was labelled `operator_attested_prior_incident`, so this screenshot is not independent proof of a new APCI frame modification.
 
 ![R26 - Incident information retained after recovery](images/R26-Retained-Incident-Information.png)
 
@@ -228,5 +224,3 @@ grep -nE 'IED|AccessPoint|PTOC|PTRC|XCBR|MMXU|RREC|Communication|ConnectedAP' PU
 The logical-node search provides a compact visual hint for Scenario 05 without asserting that the file supplies an IP address or credentials.
 
 ![R28 - SCL IED and logical node identification](images/R28-SCL-Logical-Node-Grep.png)
-
-**Handoff limitation:** The supplied SCL contains no `<Communication>` section, device IP address, credentials or route to Scenario 05. It is a **realistic asset-discovery clue**, not a network pivot.

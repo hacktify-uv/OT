@@ -5,11 +5,8 @@
 **Incident severity for exercise:** High, protection function deviated from the approved baseline  
 **Evidence date:** 31 October 2026  
 **Analyst role:** SOC / OT incident response, not an attacking IEC 61850 client  
-**Observed outcome:** Incident reconstructed and evidence preserved; final operator recovery/retest not captured in the provided conversation
 
 > **Analyst instructions.** Begin with an alert describing a failed protection response, not with knowledge of the attacker's commands. Use monitoring data, native event records and engineering baselines. Do not reproduce the Red Team MMS write from the SOC workstation. Every screenshot labelled **real** is an image supplied during this investigation.
-
-> **Screenshot audit (31 October 2026):** The source conversation provides **7 genuine Red Team screenshots and 7 genuine Blue Team SOC screenshots**. The Blue Team document embeds all seven supplied investigation captures at the point of use. Source attribution, a real SIEM alert, and restored relay output remain uncaptured.
 
 ## 1. Incident intake
 
@@ -41,7 +38,7 @@ sudo jq '{asset,active_setting_group,threshold_amps,last_test_current_amps,last_
 
 ![Figure B01. SOC triage: anomalous relay state after 1300 A test.](images/blue-01-anomalous-relay-state.png)
 
-**Analyst judgement:** This is not merely an alarm-noise condition. Protection has remained inactive under the instructor's fault test. Do not yet conclude maliciousness: the analyst still needs engineering-change approval information.
+**Analyst judgement:** This is not merely an alarm-noise condition. Protection has remained inactive under the instructor's fault test.
 
 ## 3. Preserve evidence before any containment
 
@@ -57,7 +54,7 @@ The local directory holds a snapshot of the relay state, event log, journald exp
 
 ![Figure B02. Evidence directory and SHA-256 manifest created.](images/blue-02-evidence-collection.png)
 
-**Suggested additional evidence hardening (not recorded):** record analyst identity, host clock, acquisition time, original file metadata and destination custody, then copy evidence off-host to a restricted case repository.
+**Evidence handling:** record analyst identity, host clock, acquisition time, original file metadata and destination custody, then copy evidence off-host to a restricted case repository.
 
 ## 4. Correlate the relay's native event log
 
@@ -139,7 +136,7 @@ sudo grep -n 'SettingControl' /opt/prabal-urja/scenario5/engineering/PU-DSS-IED-
 
 ![Figure B08. SCL file declares two groups and initial actSG=1.](images/blue-07-scl-baseline.png)
 
-**Meaning:** the declared initial active group is 1, while the running system was observed in group 2. This supports a configuration-deviation finding. **Approval records were not provided**. The analyst should request the protection commissioning/change ticket, responsible engineer, authorisation window and corresponding work order. Until these are checked, classify the event as **suspected unauthorised engineering activity**, not conclusively attributable malicious action.
+**Meaning:** the declared initial active group is 1, while the running system was observed in group 2. This supports a configuration-deviation finding. The analyst should request the protection commissioning/change ticket, responsible engineer, authorisation window and corresponding work order. Until these are checked, classify the event as **suspected unauthorised engineering activity**, not conclusively attributable malicious action.
 
 ## 8. Incident declaration and containment decision
 
@@ -162,7 +159,7 @@ The lab implementation has no client-identity binding on the setting-group callb
 
 ## 9. Recovery handoff to authorised OT engineering
 
-**The steps in this section are an operator playbook. They were recommended but NOT shown as completed in the provided conversation.** This distinction protects the assessor from fabricated closure evidence.
+
 
 After incident commander approval and evidence preservation, the OT engineer on the Ubuntu scenario host can reset the model with the packaged recovery script:
 

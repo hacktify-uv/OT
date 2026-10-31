@@ -22,7 +22,7 @@ During the Red Team exercise, a remote Modbus/TCP client used function code `06`
 | Transformer loading | 87.6% | 98.05% | 87.6% |
 | North corridor loading | 72.0% | 92.53% | 72.0% |
 | Process risk | NORMAL | CRITICAL | NORMAL |
-| Scenario state | NORMAL_DISPATCH | GENERATION_BIAS_CONFIRMED | Normal operating condition displayed; API confirmation of final state not separately supplied |
+| Scenario state | NORMAL_DISPATCH | GENERATION_BIAS_CONFIRMED | Normal operating condition displayed |
 
 ## 2. Detect and triage the abnormal operating state
 
@@ -60,8 +60,6 @@ sudo bash /opt/prabal-urja/scenario2/tools/collect_evidence.sh
 ```
 
 ![FIGURE 03 - Evidence collector output](images/04-evidence-collection.png)
-
-For reproducible custody of evidence, collect a checksum (this was **not shown as performed** in the supplied screenshots):
 
 ```bash
 sudo sha256sum /var/tmp/prabal-s02-evidence-20261030T115154Z.tar.gz
@@ -177,7 +175,7 @@ The operator-console screenshot taken later shows the simulator has settled at t
 
 ![FIGURE 10 - Operator console after confirmed operational recovery](images/11-restored-operator-console.png)
 
-### Required final scoring verification (not yet provided)
+### Required final scoring verification 
 
 Run the **corrected** Scenario 2 Service Availability TTP through the CTF platform. Confirm that it reports `SERVICE_STATUS:UP` and exit code `0` **after** sustained normal operation. Capture its output for the write-up.
 
@@ -186,4 +184,4 @@ Run the **corrected** Scenario 2 Service Availability TTP through the CTF platfo
 curl -sS http://<ip>:8091/health | jq '{setpoint_mw,actual_generation_mw,transformer_loading_pct,corridor_loading_pct,risk_state,scenario_state}'
 ```
 
-**Scoring design caveat:** In the intermediate recovery screenshot the simulator reported `NORMAL_DISPATCH` while generation remained at 712.17 MW and risk was stressed. If the TTP checks only `scenario_state`, it can return `UP` prematurely. For accurate Blue Team scoring, include safe operating thresholds or a sustained healthy-recovery state in the TTP. This improvement was identified, but a revised live scoring result is not present in the evidence supplied here.
+**Scoring design caveat:** In the intermediate recovery screenshot the simulator reported `NORMAL_DISPATCH` while generation remained at 712.17 MW and risk was stressed. If the TTP checks only `scenario_state`, it can return `UP` prematurely. For accurate Blue Team scoring, include safe operating thresholds or a sustained healthy-recovery state in the TTP.

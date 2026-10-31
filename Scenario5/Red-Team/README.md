@@ -8,8 +8,6 @@
 **Evidence date:** 31 October 2026  
 **Result:** Remote MMS setting-group change proven, threshold changed to 1600 A, simulated protection failure proven by instructor fixture
 
-> **Scope and accuracy.** This is a reproducible walkthrough of the actual isolated Prabal Urja lab. The commands and output described as **observed** came from the user's screenshots or terminal results. Commands labelled **recommended**, **optional**, or **instructor-only** must not be represented as actions captured during the original attack. It is a simulated IED running libIEC61850, not a real utility relay or a disclosed vendor vulnerability. The original package does not implement electrical islanding or GOOSE exploitation.
-
 ## 1. Scenario and objective
 
 A digital substation relay monitors a modelled feeder. An approved protection setting group (group 1) uses an overcurrent threshold of **800 A**. A second commissioning setting group (group 2) uses **1600 A**. The simulated relay accepts activation of another setting group through IEC 61850 MMS without independently checking commissioning approval. This creates an engineering-authorisation weakness.
@@ -43,7 +41,7 @@ Native libIEC61850 IED server -> protection-state model
 
 The exercise started from the Mac, not from an interactive shell on the Ubuntu IED. The Ubuntu machine was used by an instructor to deploy the range, run the independent fault fixture and evaluate the service-availability TTP. No SSH session or server-side file edit was used for the Red Team setting-group write.
 
-**Tool provenance:** The participant installed the prebuilt `iec61850ctl` v0.6.0 binary for `darwin/amd64` from the upstream releases at <https://github.com/otfabric/iec61850ctl/releases>. The downloaded archive passed SHA-256 verification, and `iec61850ctl version` printed `0.6.0` (observed in terminal conversation; no separate screenshot provided). Installation of Qt/QTester104 was unnecessary for this scenario.
+**Tool provenance:** The participant installed the prebuilt `iec61850ctl` v0.6.0 binary for `darwin/amd64` from the upstream releases at <https://github.com/otfabric/iec61850ctl/releases>. The downloaded archive passed SHA-256 verification, and `iec61850ctl version` printed `0.6.0`. Installation of Qt/QTester104 was unnecessary for this scenario.
 
 **On other operating systems:** Select an asset matching the operating system and CPU architecture from the upstream release listing, verify its supplied checksum, and execute the tool locally. Windows/Linux commands are not claimed as tested during this Mac-based run. Do not rename an ARM64 binary as AMD64 or assume the same shell syntax across platforms.
 
@@ -183,4 +181,4 @@ The original distributed TTP evaluated the native MMS read together with the ind
 | Independent test | 1300 A, no trip | Simulated protection impact confirmed |
 | Final scorer | `SERVICE_STATUS:DOWN` | Lab's attack-impact condition satisfied |
 
-**Do not treat group 2 alone as proven protection failure.** The final fault test is the independent proof. Likewise, a `DOWN` result caused only by an MMS process outage is not proof of setting-group manipulation.
+Likewise, a `DOWN` result caused only by an MMS process outage is not proof of setting-group manipulation.

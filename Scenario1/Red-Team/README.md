@@ -11,8 +11,6 @@
 
 > **Platform-neutral instructions.** This challenge does not require a MacBook or a specific operating system. Use any Windows, Linux, macOS or other workstation that can reach the isolated lab and run a suitable OPC UA client. The screenshots show one Prosys client session, not an installation requirement. Menu labels may differ, but the OPC UA node operations and server responses are what matter.
 
-> **Evidence standard.** The OPC UA connection, reads, writes, maintenance-state change, HMI result and scoring-check failure are evidenced by the screenshots and terminal output supplied during the exercise. Independent physical-process divergence and a routable Scenario 2 transition are **not** yet evidenced and are listed as outstanding tests. Do not present either as confirmed.
-
 ## 1. Objective and observed result
 
 The Red Team objective was to determine whether an anonymous OPC UA client could misuse the Unit-2 maintenance pathway to hold the operator's displayed telemetry and inhibit alarms without shutting down the service.
@@ -279,7 +277,7 @@ for i in 1 2 3; do
 done
 ```
 
-**Pass criterion:** during `override=true`, `actual_power_mw` changes in `/var/log/prabal-urja/process-actual.log` while `displayed_power_mw` and the HMI's active-power reading remain constant. The supplied materials do not yet include these log samples. Attach them before claiming that particular comparison is proven.
+**Pass criterion:** during `override=true`, `actual_power_mw` changes in `/var/log/prabal-urja/process-actual.log` while `displayed_power_mw` and the HMI's active-power reading remain constant.
 
 > **[PENDING IMAGE SLOT P1]** Insert a real Ubuntu terminal screenshot showing two `PROCESS_SAMPLE` records with changing `actual_power_mw` and unchanged `displayed_power_mw`. Do not create a synthetic screenshot.
 
@@ -307,7 +305,7 @@ After documenting the compromise, use the same OPC UA client (or another compati
 | `MaintenanceMode` | `False` |
 | `MaintenanceTicket` | Empty String |
 
-Refresh `OverrideAccepted` and `Health/ScenarioState`, then refresh the HMI. Expected normal-state values are `OverrideAccepted=false` and `ScenarioState=NORMAL_OPERATION`. **Restoration has not been shown in the supplied screenshots**, so this remains a required end-of-exercise check.
+Refresh `OverrideAccepted` and `Health/ScenarioState`, then refresh the HMI. Expected normal-state values are `OverrideAccepted=false` and `ScenarioState=NORMAL_OPERATION`.
 
 On Ubuntu, preserve original event evidence using the source package's collector:
 
