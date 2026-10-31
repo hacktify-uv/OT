@@ -1,13 +1,6 @@
 # Prabal Urja | Scenario 04
 ## Blue Team SOC Investigation: IEC-104 Session Integrity
 
-**Case ID:** `S04-SOC-20261031-083857`  
-**Investigation date:** 31 October 2026, timestamps below are UTC  
-**Defender platform:** Ubuntu OT range VM (SOC and authorised defender access)  
-**Objective:** Detect loss of native SCADA telemetry, preserve evidence, correlate IEC-104 logs and PCAPs, identify the lab trigger, contain repeat exercise requests, and document what is and is not proven.
-
-> **SOC evidence standard.** A restored service is not evidence that no incident occurred. A legacy incident record is not automatically packet-level proof. In this case, application logs and PCAPs confirm repeated legitimate-master disconnections, and access logs identify a gateway-triggered lab experiment immediately beforehand. The preserved defender PCAPs do not independently show the rewritten APCI `N(S)` values.
-
 ### SOC case summary
 
 | Field | Case finding |
@@ -21,8 +14,6 @@
 | Strongest corroboration | Master logs + TCP resets + participant trigger journal |
 | Containment | Stop `prabal-s04-participant-gateway.service` |
 | Scope | Isolated simulation only; no physical process controlled |
-
-**SOC classification:** **Confirmed training-range telecontrol disruption with a correlated participant-gateway trigger.** The specific altered on-wire APCI bytes are supported by the training runner report but **not verified independently** in these defender captures. This distinction should remain in any final incident record.
 
 ---
 
@@ -256,8 +247,6 @@ CASE="$(cat /root/s04-soc-case-path.txt)"
 **Full time-window evidence:** The broader journal excerpt includes the accepted gateway request at 08:30:13 UTC, local API polling and the subsequent disconnections.
 
 ![B21 - Expanded SOC gateway-to-disconnection timeline](images/B21-Full-Gateway-Trigger-Timeline.png)
-
-**Attribution:** This supports a **training gateway-triggered** disruption from a configured VPN participant, not an assertion that `<ip>` injected raw IEC-104 packets directly. The particular byte modifications were reported by the lab runner, not proven by these PCAPs.
 
 ### 09. Apply lab-specific containment
 

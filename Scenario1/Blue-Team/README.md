@@ -65,8 +65,6 @@ cd /var/tmp
 sudo sha256sum -c prabal-s01-evidence-20261030T101307Z.tar.gz.sha256
 ```
 
-The collector copies OPC UA/HMI/capture journals, audit logs, process samples, packet captures, sockets and system metadata. **Archive creation is confirmed; checksum verification output has not yet been supplied.**
-
 ![Figure 03: evidence collection output](images/03-evidence-archive.png)
 
 ## 5. Reconstruct the actual attack timeline

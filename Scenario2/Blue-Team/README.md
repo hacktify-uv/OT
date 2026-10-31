@@ -7,8 +7,6 @@
 **Classification:** Isolated OT cyber-range exercise  
 **Method:** Evidence-first incident response, operational recovery without hardening
 
-> **Verified outcome:** The Blue Team identified the unauthorised setpoint changes, preserved an evidence archive, correlated Modbus captures with the process historian, restored the setpoint to 650 MW and observed the simulator return to 650 MW with normal risk and no active protection alarm. **A final successful `SERVICE_STATUS:UP` result from the revised scoring TTP was not supplied**, so dashboard recovery is not independently verified. No hardening was performed by design.
-
 ## 1. Incident overview and what the team observed
 
 During the Red Team exercise, a remote Modbus/TCP client used function code `06` (Write Single Register) to alter the Unit-2 governor generator-setpoint register, address `1024`, from its approved 650 MW baseline through 655 MW and 700 MW to 720 MW. The command-sequence register at address `1029` advanced from 101 to 104. The real OpenPLC service accepted the writes; the pandapower-based simulator calculated elevated generator output and equipment loading. The operator console displayed a **CRITICAL** process risk and the grid-health API declared `GENERATION_BIAS_CONFIRMED`.
@@ -141,8 +139,6 @@ done
 
 ![FIGURE 08 - Remote Modbus FC06 writes and source IP](images/09-remote-fc06-requests.png)
 
-**Attribution:** `<ip>` is confirmed as the **observed source IP of the remote Modbus writes**. The identity of the person/workstation behind it is not independently verified. The `modbus.regval_uint16` field was blank in that extraction, so values are established by the event log and HMI, not claimed as directly decoded from this PCAP output.
-
 ## 7. Restore the approved 650 MW dispatch
 
 The Blue Team intentionally performed **operational restoration without applying firewall or authorised-master hardening**. The evidence archive had already been collected.
@@ -162,8 +158,6 @@ printf '\x00\x0a\x00\x00\x00\x06\x01\x06\x04\x00\x02\x8a' | nc -w 4 -q 1 <ip> 50
 ![FIGURE 09 - Recovery write and interim process state](images/10-recovery-register-write.png)
 
 Immediately after the write, the API showed `setpoint_mw=650`, `actual_generation_mw=712.17`, transformer **96.84%**, corridor **90.13%**, and `risk_state=1`, while `scenario_state` had already cleared to `NORMAL_DISPATCH`. That is **partial operational recovery**, not the final settled state.
-
-The later HMI screenshot retains **command sequence 104**, so the proposed optional sequence advance to 105 is **not verified as executed**. No claim is made that it was.
 
 ## 8. Verify the final recovered process state
 

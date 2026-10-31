@@ -221,5 +221,3 @@ The source also defines a read-only endpoint:
 ```bash
 curl -sS http://<ip>:8090/api/intertie
 ```
-
-**What is verified:** The asset identifier and operational dependency are present in the running Scenario 2 HMI, as captured in the screenshots. **What is not verified:** DNS resolution, a routable Scenario 3 IP, a DNP3 endpoint, or authorisation to operate that endpoint. The HMI clue is not evidence of a complete network pivot. Verify the Scenario 3 deployment separately.

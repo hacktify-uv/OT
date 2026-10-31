@@ -2,12 +2,6 @@
 
 ## Blue Team Investigation and Recovery Runbook
 
-**Site:** River Bend 220/132 kV Substation  
-**Asset:** `PU-RB-RTU-07`  
-**Protocol:** DNP3/TCP  
-**Investigation reference:** Scenario 03, unauthorised maintenance-channel switching  
-**Evidence status:** Incident detection and forensic collection verified. Containment and restoration remain **not executed / not verified** in the evidence provided.
-
 > **Scope and integrity:** This report concerns the authorised Prabal Urja simulated OT environment. It records what the Blue Team actually observed and separates proposed response actions from completed actions. The equipment, electrical loading and alarms are simulator outputs, not claims about a physical substation.
 
 ## 1. Incident summary

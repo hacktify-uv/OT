@@ -28,7 +28,7 @@ The Red Team objective was to determine whether an anonymous OPC UA client could
 | Maintenance controls | `MaintenanceMode`, `FreezeTelemetry` and `AlarmSuppression` set to `true`; final HMI confirms all three |
 | Operational application effect | Accepted override, maintenance hold, reduced data quality, alarms inhibited in the simulated HMI |
 | CTF score condition | `SERVICE_STATUS:DOWN`, `TTP_EXIT_CODE=1` observed in the Ubuntu scoring test |
-| Scenario 2 clue | `PU-GOV-PLC-02` and `Modbus/TCP` exposed; no Scenario 2 network route verified |
+| Scenario 2 clue | `PU-GOV-PLC-02` and `Modbus/TCP` exposed |
 
 ## 2. Reconnaissance and baseline
 
@@ -293,8 +293,6 @@ The genuine information visible through the OPC UA engineering metadata and fina
 DownstreamController = PU-GOV-PLC-02
 SouthboundProtocol   = Modbus/TCP
 ```
-
-That establishes the **identity and protocol** of the next engineering asset, not a working network handoff. No Scenario 2 target IP, controller route, or actual Modbus response has been demonstrated in the supplied evidence. The next exercise must map `PU-GOV-PLC-02` to a real deployed endpoint and verify native Modbus communication before the transition can be called complete.
 
 > **[PENDING IMAGE SLOT P3]** Insert a real Scenario 2 controller discovery / Modbus client screenshot after it has been tested. No IP or command result is supplied here because none has been confirmed.
 
