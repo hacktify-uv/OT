@@ -205,19 +205,3 @@ curl -sS http://127.0.0.1:8091/health | jq '{setpoint_mw,actual_generation_mw,tr
 **Not verified:** Final scoring TTP return to `UP`; real-world operator identity behind `10.200.0.8`; native interconnection to Scenario 3. The console displays River Bend RTU identifier `PU-RB-RTU-07`, but that does not prove that the DNP3 endpoint is reachable.
 
 **Exercise recovery scope:** No hardening, allowlist, firewall change, or challenge reset is included, per exercise requirements. This makes the simulated attack repeatable; it is not a recommended production incident-response stopping point.
-
-## 10. Evidence register
-
-| Evidence ID | File within bundle | Purpose |
-|---|---|---|
-| BT-01 | `images/01-compromised-operator-console.png` | Critical process state |
-| BT-02 | `images/02-confirmed-simulator-state.png` | Confirmed simulator attack state |
-| BT-03 | `images/04-evidence-collection.png` | Evidence archive creation |
-| BT-04 | `images/05-plc-command-history.png` | Setpoint and sequence timeline |
-| BT-05 | `images/06-process-historian.png` | Sustained process impact |
-| BT-06 | `images/09-remote-fc06-requests.png` | Remote protocol write source |
-| BT-07 | `images/10-recovery-register-write.png` | Modbus recovery command |
-| BT-08 | `images/11-restored-operator-console.png` | Settled normal state |
-| BT-09 | `images/12-final-ttp-up.png` | Pending final scoring evidence |
-
-*Evidence note: The screenshots are real captures shared during the exercise. The PDF and Markdown are written from those observations. Where a result was not supplied, it is explicitly labelled pending.*

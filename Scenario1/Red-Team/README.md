@@ -357,27 +357,3 @@ The actor did not exploit a browser flaw, crash a server or execute code on the 
 
 **What is proven:** native OPC UA access, successful anonymous maintenance writes, accepted override, degraded operator view state, working score-detection predicate.  
 **What remains to prove:** time-aligned actual-versus-displayed telemetry divergence, Blue Team restoration with `UP` scoring, and end-to-end Scenario 2 Modbus connectivity.
-
-## 9. Evidence checklist and screenshot index
-
-| Figure | Filename | What it demonstrates |
-| --- | --- | --- |
-| 01 | `images/01-security-none.png` | OPC UA Security Mode None |
-| 02 | `images/02-anonymous-authentication.png` | Anonymous client session selection |
-| 03 | `images/03-connected-address-space.png` | Successful native open62541 address-space browse |
-| 04 | `images/04-hmi-normal-operation.png` | HMI before the attack |
-| 05 | `images/05-approved-work-order.png` | Approved work order `PU-MW-0427` |
-| 06 | `images/06-telemetry-gateway-nodes.png` | Actual maintenance variables |
-| 07 | `images/07-maintenance-ticket-entry.png` | Ticket write dialog |
-| 08 | `images/08-maintenance-ticket-readback.png` | Successful server read-back |
-| 09 | `images/09-maintenance-mode-true.png` | Maintenance mode input |
-| 10 | `images/10-hmi-maintenance-pending.png` | Intermediate application state |
-| 11 | `images/11-freeze-telemetry-readback.png` | Freeze request read-back |
-| 12 | `images/12-alarm-suppression-true.png` | Alarm suppression input |
-| 13 | `images/13-alarm-suppression-readback.png` | Alarm suppression read-back |
-| 14 | `images/14-hmi-override-accepted.png` | Final HMI result |
-| P1 | *Not supplied* | Actual-versus-displayed process-log comparison |
-| P2 | *Not supplied* | Repeated HMI API freeze verification |
-| P3 | *Not supplied* | Actual Scenario 2 Modbus handoff |
-
-**Evidence provenance:** Figures 01-14 are original screenshots from the authorised client/server exercise on 30 October 2026. Their appearance reflects the client used for evidence capture, not an operating-system requirement. The written TTP status and API excerpts are based on the actual terminal output supplied in the same exercise. No fabricated screenshots, invented Scenario 2 IP addresses or simulated terminal captures have been added.
