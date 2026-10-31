@@ -1,0 +1,185 @@
+# Prabal Urja | Scenario 1 | Blue Team Investigation and Recovery
+
+**Challenge:** The Trusted Maintenance Window  
+**Evidence date:** 30 October 2026  
+**Affected asset:** `PU-OPCUA-GW-01`, Unit 2  
+**Exercise server:** `172.24.4.26`  
+**Scope:** Investigate the demonstrated OPC UA telemetry-integrity incident, preserve the evidence, restore the normal application state and validate the CTF scoring check. This procedure does not alter the challenge's persistent access configuration.
+
+## 1. Incident summary
+
+The Red Team connected to a real open62541 OPC UA server and modified maintenance variables exposed to an anonymous client. The approved work-order reference was discovered by reading `EngineeringMetadata/LastApprovedWorkOrder`; it was not guessed. The accepted combination of `MaintenanceTicket`, `MaintenanceMode`, `FreezeTelemetry` and `AlarmSuppression` caused the operator's telemetry to enter `MAINTENANCE_HOLD` while the underlying time-dependent process simulation continued changing.
+
+**What is proven:** the override, HMI integrity degradation, corresponding audit events, continuing simulated process variation, collected evidence archive and manually tested CTF `DOWN` scoring logic. **Not yet proven:** packet-level attribution of the remote writer, the final restoration test, dashboard points deduction, and a working connection to Scenario 2.
+
+## 2. Detection: inspect the live state
+
+Run on the Ubuntu challenge host:
+
+```bash
+curl -sS http://127.0.0.1:8088/api/state | jq '{channel_state,telemetry_quality,maintenance_mode,freeze_telemetry,alarm_suppression,maintenance_ticket,override_accepted,scenario_state}'
+```
+
+The captured response showed:
+
+| Field | Observed value |
+|---|---|
+| Channel | `MAINTENANCE_HOLD` |
+| Data quality | `UNCERTAIN_LAST_USABLE_VALUE` |
+| Maintenance mode | `true` |
+| Freeze telemetry | `true` |
+| Alarm suppression | `true` |
+| Maintenance ticket | `PU-MW-0427` |
+| Override accepted | `true` |
+| Scenario state | `UNAUTHORISED_MAINTENANCE_OVERRIDE` |
+
+![Figure 01: HMI state during active override](images/01-compromised-hmi-state.png)
+
+## 3. Distinguish process integrity from service uptime
+
+```bash
+sudo systemctl is-active prabal-opcua.service prabal-hmi.service prabal-opcua-capture.service
+```
+
+All three services returned `active`. This does **not** mean the telemetry was trustworthy: the CTF's corrected Service Availability TTP treats a verified telemetry-integrity compromise as a scoring failure and returns `SERVICE_STATUS:DOWN` with exit code `1` while the services may still run normally.
+
+![Figure 02: all three systemd services active](images/02-running-services.png)
+
+## 4. Preserve evidence before restoring state
+
+```bash
+sudo /opt/prabal-urja/scenario1/tools/collect_evidence.sh /var/tmp/prabal-s01-evidence
+```
+
+The observed output reported:
+
+```text
+EVIDENCE_DIR=/var/tmp/prabal-s01-evidence-20261030T101307Z
+EVIDENCE_ARCHIVE=/var/tmp/prabal-s01-evidence-20261030T101307Z.tar.gz
+```
+
+Verify the archive and preserve it securely:
+
+```bash
+cd /var/tmp
+sudo sha256sum -c prabal-s01-evidence-20261030T101307Z.tar.gz.sha256
+```
+
+The collector copies OPC UA/HMI/capture journals, audit logs, process samples, packet captures, sockets and system metadata. **Archive creation is confirmed; checksum verification output has not yet been supplied.**
+
+![Figure 03: evidence collection output](images/03-evidence-archive.png)
+
+## 5. Reconstruct the actual attack timeline
+
+```bash
+sudo grep -E 'NODE_WRITE_DETECTED|OVERRIDE_ACTIVE|OVERRIDE_CLEARED' /var/log/prabal-urja/opcua-audit.log | tail -n 40
+```
+
+| Time (UTC), 30 Oct 2026 | Verified audit event |
+|---|---|
+| 09:12:34 | `MaintenanceTicket` changed from empty to `PU-MW-0427` |
+| 09:16:27 | `MaintenanceMode` changed from `false` to `true` |
+| 09:18:37 | `FreezeTelemetry` changed from `false` to `true` |
+| 09:19:24 | `AlarmSuppression` changed from `false` to `true` |
+| 09:19:24 | `OVERRIDE_ACTIVE`, `effect=freeze_and_alarm_suppression` |
+
+**Interpretation:** the audit shows server-side variable changes and activation of the vulnerable application logic. It is not, by itself, proof of which client IP performed each write.
+
+![Figure 04: actual audit entries](images/04-audit-timeline.png)
+
+## 6. Prove actual telemetry is diverging from displayed telemetry
+
+```bash
+sudo tail -n 12 /var/log/prabal-urja/process-actual.log
+sleep 12
+sudo tail -n 5 /var/log/prabal-urja/process-actual.log
+```
+
+Representative values visible in the collected screenshots:
+
+| Process sample | Actual power (MW) | Displayed power (MW) |
+|---|---:|---:|
+| Initial | 119.630 | 116.647 |
+| Later | 118.680 | 116.647 |
+| Later | 116.000 | 116.647 |
+| Later | 120.362 | 116.647 |
+| Follow-up | 117.589 | 116.647 |
+
+This is the technical result of the exercise. The source implements a **simulated** generating process; it is not a measurement from physical generating equipment. The operator display is stale even while the internal simulated values change.
+
+![Figure 05: actual versus displayed values](images/05-process-divergence.png)
+
+![Figure 06: follow-up process samples](images/06-process-continuity.png)
+
+## 7. Investigate network attribution, without guessing
+
+Inspect current sessions and packet files:
+
+```bash
+sudo ss -tnp state established '( sport = :4840 )'
+sudo find /var/log/prabal-urja/pcap -maxdepth 1 -type f -printf '%f\n'
+```
+
+Review historical sessions during the **write times**:
+
+```bash
+sudo journalctl -u prabal-opcua.service --utc --since '2026-10-30 09:10:00 UTC' --until '2026-10-30 09:21:00 UTC' --no-pager | grep -E 'Connection opened|Session created|ActivateSession|SecurityPolicy'
+```
+
+The provided journal excerpt at **09:15:19 UTC** shows a connection from `127.0.0.1` and a `Pure Python Async Client Session1`. This is a local session, not proof of the attacker. A later socket snapshot showed a connection from `10.200.0.8`, but that snapshot was taken after the malicious writes. Neither observation establishes who performed the writes. Historical packet analysis would be needed for stronger attribution.
+
+![Figure 07: existing sessions, attribution inconclusive](images/07-network-sessions.png)
+
+![Figure 08: available packet files](images/08-packet-captures.png)
+
+![Figure 09: local session is not attacker attribution](images/09-local-journal-session.png)
+
+## 8. Restore normal operation for the exercise
+
+**First confirm evidence collection is complete.** On an authorised OPC UA client, browse:
+
+`Objects → Prabal Urja → HydroPlant → Unit2 → TelemetryGateway`
+
+Use the variable's **Write Value** operation to restore the following values in this order:
+
+| Variable | Recovery value |
+|---|---|
+| `AlarmSuppression` | `false` (Boolean) |
+| `FreezeTelemetry` | `false` (Boolean) |
+| `MaintenanceMode` | `false` (Boolean) |
+| `MaintenanceTicket` | Empty String |
+
+The server's application code evaluates the override condition continuously. Clearing an individual required Boolean deactivates it; clearing the remaining variables and ticket returns the lab to an ordinary baseline. This recovery has **not yet been shown in the supplied screenshots**.
+
+Do not restart the host or use the exercise reset script merely to clear the incident. Both would interfere with the investigation record or exercise state.
+
+## 9. Confirm recovery and scoring
+
+```bash
+curl -sS http://127.0.0.1:8088/api/state | jq '{channel_state,telemetry_quality,maintenance_mode,freeze_telemetry,alarm_suppression,maintenance_ticket,override_accepted,scenario_state}'
+```
+
+Expect `ONLINE`, `GOOD`, the three Boolean maintenance controls `false`, the ticket empty, `override_accepted=false`, and `NORMAL_OPERATION`. Check that power starts changing again:
+
+```bash
+curl -sS http://127.0.0.1:8088/api/state | jq '.active_power_mw'
+sleep 8
+curl -sS http://127.0.0.1:8088/api/state | jq '.active_power_mw'
+```
+
+Finally rerun the corrected **Service Availability TTP** from the CTF dashboard. Expected after recovery:
+
+```text
+SERVICE_STATUS:UP | REASON:NORMAL_OPERATION | OPCUA_PROBE:PASS | HMI_PROBE:PASS
+```
+
+The expected exit code is `0`. Actual recovery output and dashboard score adjustment remain to be captured. Keep those as explicit evidence placeholders rather than presenting them as verified.
+
+**[IMAGE PLACEHOLDER 10: Add recovered HMI/API screenshot here]**
+**[IMAGE PLACEHOLDER 11: Add final TTP UP/dashboard screenshot here]**
+
+## 10. Blue Team conclusion
+
+**Verified:** The Scenario 1 Red Team operation caused a genuine OPC UA application-state change; the operator telemetry was frozen and alarms were suppressed within the simulated application. The investigation preserved supporting audit, process and packet-capture evidence. Service uptime alone was not an appropriate measure of process integrity.
+
+**Pending:** Proven source attribution, successful recovery test, scoring dashboard confirmation and a verified network transition to Scenario 2. The engineering metadata identifies `PU-GOV-PLC-02` and `Modbus/TCP` but does not independently establish that the controller is reachable.
