@@ -1,6 +1,6 @@
 # Prabal Urja | Scenario 04
 
-[Exercise overview](../../README.md) · [Scenario 4](../README.md) · [Other team](../Blue-Team/README.md)
+[Exercise overview](../../README.md) · [Scenario 4](../README.md) · [Other team](../Blue-Team/Blue-Writeup-S4.md)
 
 ## Starting information
 

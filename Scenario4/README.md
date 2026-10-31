@@ -6,8 +6,8 @@ Scenario 3 identifies the dispatch control authority and IEC-104 telecontrol rel
 **Protocol:** IEC 60870-5-104  
 **Objective:** Disrupt fresh dispatch telemetry.
 
-- [Red Team walkthrough](Red-Team/README.md)
-- [Blue Team investigation and recovery](Blue-Team/README.md)
+- [Red Team walkthrough](Red-Team/Red-Writeup-S4.md)
+- [Blue Team investigation and recovery](Blue-Team/Blue-Writeup-S4.md)
 
 ## Continue the investigation
 
@@ -16,3 +16,5 @@ The incident-linked SCL engineering file identifies digital-substation IED `PU-D
 [Continue to Scenario 5](../Scenario5/README.md)
 
 [Exercise overview](../README.md)
+
+[Download OT-Range-Scenario4.zip](OT-Range-Scenario4.zip)

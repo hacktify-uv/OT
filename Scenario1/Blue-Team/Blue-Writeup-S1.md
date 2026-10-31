@@ -1,6 +1,6 @@
 # Prabal Urja | Scenario 1 | Blue Team Investigation and Recovery
 
-[Exercise overview](../../README.md) · [Scenario 1](../README.md) · [Other team](../Red-Team/README.md)
+[Exercise overview](../../README.md) · [Scenario 1](../README.md) · [Other team](../Red-Team/Red-Writeup-S1.md)
 
 ## Starting information
 

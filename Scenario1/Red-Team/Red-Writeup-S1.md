@@ -1,6 +1,6 @@
 # Scenario 01: The Trusted Maintenance Window
 
-[Exercise overview](../../README.md) · [Scenario 1](../README.md) · [Other team](../Blue-Team/README.md)
+[Exercise overview](../../README.md) · [Scenario 1](../README.md) · [Other team](../Blue-Team/Blue-Writeup-S1.md)
 
 ## Starting information
 

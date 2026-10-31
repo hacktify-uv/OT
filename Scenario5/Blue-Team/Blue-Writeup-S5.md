@@ -1,6 +1,6 @@
 # Prabal Urja | Scenario 05 | Blue Team SOC Investigation
 
-[Exercise overview](../../README.md) · [Scenario 5](../README.md) · [Other team](../Red-Team/README.md)
+[Exercise overview](../../README.md) · [Scenario 5](../README.md) · [Other team](../Red-Team/Red-Writeup-S5.md)
 
 ## Starting information
 

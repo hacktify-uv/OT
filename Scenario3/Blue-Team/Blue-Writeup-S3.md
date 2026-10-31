@@ -1,6 +1,6 @@
 # Prabal Urja | Scenario 03: Rogue DNP3 Master
 
-[Exercise overview](../../README.md) · [Scenario 3](../README.md) · [Other team](../Red-Team/README.md)
+[Exercise overview](../../README.md) · [Scenario 3](../README.md) · [Other team](../Red-Team/Red-Writeup-S3.md)
 
 ## Starting information
 

@@ -1,6 +1,6 @@
 # Prabal Urja | Scenario 02 - Red Team Walkthrough
 
-[Exercise overview](../../README.md) · [Scenario 2](../README.md) · [Other team](../Blue-Team/README.md)
+[Exercise overview](../../README.md) · [Scenario 2](../README.md) · [Other team](../Blue-Team/Blue-Writeup-S2.md)
 
 ## Starting information
 

@@ -6,8 +6,8 @@ Scenario 1 exposes the governor controller identifier `PU-GOV-PLC-02` and its Mo
 **Protocol:** Modbus/TCP  
 **Objective:** Raise generation from 650 MW to 720 MW.
 
-- [Red Team walkthrough](Red-Team/README.md)
-- [Blue Team investigation and recovery](Blue-Team/README.md)
+- [Red Team walkthrough](Red-Team/Red-Writeup-S2.md)
+- [Blue Team investigation and recovery](Blue-Team/Blue-Writeup-S2.md)
 
 ## Continue the investigation
 
@@ -16,3 +16,5 @@ The Intertie Coordination panel identifies River Bend RTU `PU-RB-RTU-07` and its
 [Continue to Scenario 3](../Scenario3/README.md)
 
 [Exercise overview](../README.md)
+
+[Download OT-Range-Scenario2.zip](OT-Range-Scenario2.zip)

@@ -1,6 +1,6 @@
 # Prabal Urja | Scenario 05 | Red Team Write-up
 
-[Exercise overview](../../README.md) · [Scenario 5](../README.md) · [Other team](../Blue-Team/README.md)
+[Exercise overview](../../README.md) · [Scenario 5](../README.md) · [Other team](../Blue-Team/Blue-Writeup-S5.md)
 
 ## Starting information
 

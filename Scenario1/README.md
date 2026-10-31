@@ -6,8 +6,8 @@ This is the starting point: investigate the Unit-2 telemetry gateway and its mai
 **Protocol:** OPC UA  
 **Objective:** Freeze operator telemetry and suppress alarms.
 
-- [Red Team walkthrough](Red-Team/README.md)
-- [Blue Team investigation and recovery](Blue-Team/README.md)
+- [Red Team walkthrough](Red-Team/Red-Writeup-S1.md)
+- [Blue Team investigation and recovery](Blue-Team/Blue-Writeup-S1.md)
 
 ## Continue the investigation
 
@@ -16,3 +16,5 @@ Engineering metadata identifies `PU-GOV-PLC-02` and `Modbus/TCP`, leading to the
 [Continue to Scenario 2](../Scenario2/README.md)
 
 [Exercise overview](../README.md)
+
+[Download OT-Range-Scenario1.zip](OT-Range-Scenario1.zip)

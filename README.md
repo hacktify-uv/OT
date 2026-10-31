@@ -12,11 +12,11 @@ flowchart LR
 
 | Scenario | Asset | Protocol | Objective | Writeups |
 |---|---|---|---|---|
-| [1: The Trusted Maintenance Window](Scenario1/README.md) | `PU-OPCUA-GW-01` | OPC UA | Freeze operator telemetry and suppress alarms | [Red](Scenario1/Red-Team/README.md) · [Blue](Scenario1/Blue-Team/README.md) |
-| [2: Silent Generation Bias](Scenario2/README.md) | `PU-GOV-PLC-02` | Modbus/TCP | Raise generation from 650 MW to 720 MW | [Red](Scenario2/Red-Team/README.md) · [Blue](Scenario2/Blue-Team/README.md) |
-| [3: Rogue DNP3 Master](Scenario3/README.md) | `PU-RB-RTU-07` | DNP3 | Transfer 620 MW onto Feeder B through switching | [Red](Scenario3/Red-Team/README.md) · [Blue](Scenario3/Blue-Team/README.md) |
-| [4: IEC-104 Session Integrity](Scenario4/README.md) | `Northern Load Dispatch Centre` | IEC 60870-5-104 | Disrupt fresh dispatch telemetry | [Red](Scenario4/Red-Team/README.md) · [Blue](Scenario4/Blue-Team/README.md) |
-| [5: Protection Setting Manipulation](Scenario5/README.md) | `PU-DSS-IED-01` | IEC 61850 MMS | Raise protection pickup from 800 A to 1600 A | [Red](Scenario5/Red-Team/README.md) · [Blue](Scenario5/Blue-Team/README.md) |
+| [1: The Trusted Maintenance Window](Scenario1/README.md) | `PU-OPCUA-GW-01` | OPC UA | Freeze operator telemetry and suppress alarms | [Red](Scenario1/Red-Team/Red-Writeup-S1.md) · [Blue](Scenario1/Blue-Team/Blue-Writeup-S1.md) |
+| [2: Silent Generation Bias](Scenario2/README.md) | `PU-GOV-PLC-02` | Modbus/TCP | Raise generation from 650 MW to 720 MW | [Red](Scenario2/Red-Team/Red-Writeup-S2.md) · [Blue](Scenario2/Blue-Team/Blue-Writeup-S2.md) |
+| [3: Rogue DNP3 Master](Scenario3/README.md) | `PU-RB-RTU-07` | DNP3 | Transfer 620 MW onto Feeder B through switching | [Red](Scenario3/Red-Team/Red-Writeup-S3.md) · [Blue](Scenario3/Blue-Team/Blue-Writeup-S3.md) |
+| [4: IEC-104 Session Integrity](Scenario4/README.md) | `Northern Load Dispatch Centre` | IEC 60870-5-104 | Disrupt fresh dispatch telemetry | [Red](Scenario4/Red-Team/Red-Writeup-S4.md) · [Blue](Scenario4/Blue-Team/Blue-Writeup-S4.md) |
+| [5: Protection Setting Manipulation](Scenario5/README.md) | `PU-DSS-IED-01` | IEC 61850 MMS | Raise protection pickup from 800 A to 1600 A | [Red](Scenario5/Red-Team/Red-Writeup-S5.md) · [Blue](Scenario5/Blue-Team/Blue-Writeup-S5.md) |
 
 ## How to follow the exercise
 
