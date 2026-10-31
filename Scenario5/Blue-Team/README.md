@@ -1,5 +1,18 @@
 # Prabal Urja | Scenario 05 | Blue Team SOC Investigation
 
+[Exercise overview](../../README.md) · [Scenario 5](../README.md) · [Other team](../Red-Team/README.md)
+
+## Starting information
+
+Scenario 4 supplies the substation SCL engineering file identifying `PU-DSS-IED-01` and its protection model. Continue with the relay setting-group investigation.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
+
+**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
+
+
 **Case type:** Suspected unauthorised protection-setting modification  
 **Affected asset:** `PU-DSS-IED-01`, IEC 61850 MMS relay simulator  
 **Incident severity for exercise:** High, protection function deviated from the approved baseline  
@@ -177,3 +190,9 @@ SERVICE_STATUS:UP | REASON:PROTECTION_ACTIVE
 **Scoring caveat:** The inline TTP can return `UP` solely because the previous group-2 suppression predicate is no longer true. Therefore, the SOC must preserve the actual successful-trip record separately; `UP` by itself is not proof of recovered protection. Once captured and approved, the operator can clear the latched trip by returning the simulator to its normal state using the approved reset method.
 
 >
+
+## Final stage
+
+This is the final stage: relate the selected protection group to the relay response under the instructor-applied 1300 A simulated fault.
+
+[Return to the exercise overview](../../README.md)

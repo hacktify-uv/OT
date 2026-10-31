@@ -1,4 +1,18 @@
-# Scenario 2
+# Scenario 2 — Silent Generation Bias
 
-- [Red Team writeup](Red-Team/README.md)
-- [Blue Team writeup](Blue-Team/README.md)
+Scenario 1 exposes the governor controller identifier `PU-GOV-PLC-02` and its Modbus/TCP protocol. Continue by examining that controller in this assigned scenario.
+
+**Asset:** `PU-GOV-PLC-02`  
+**Protocol:** Modbus/TCP  
+**Objective:** Raise generation from 650 MW to 720 MW.
+
+- [Red Team walkthrough](Red-Team/README.md)
+- [Blue Team investigation and recovery](Blue-Team/README.md)
+
+## Continue the investigation
+
+The Intertie Coordination panel identifies River Bend RTU `PU-RB-RTU-07` and its feeder/bus-tie switching dependency, leading to Scenario 3.
+
+[Continue to Scenario 3](../Scenario3/README.md)
+
+[Exercise overview](../README.md)

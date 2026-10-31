@@ -1,4 +1,25 @@
 # Prabal Urja | Scenario 04
+
+[Exercise overview](../../README.md) · [Scenario 4](../README.md) · [Other team](../Blue-Team/README.md)
+
+## Starting information
+
+Scenario 3 identifies the dispatch control authority and IEC-104 telecontrol relationship. Investigate the legitimate master/outstation communication in this scenario.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+**Exercise method:** The supplied participant gateway starts a fixed 95-second APCI sequence-modification experiment within the existing master/outstation path. The Red Team requests the experiment and observes its effect.
+
+**Terminal setup:** In Bash or Zsh, enter the assigned address when prompted. Commands below use `TARGET`; replace `<ip>` with the same address in browser URLs and graphical clients.
+
+```bash
+printf "Assigned scenario address: "
+read -r TARGET
+export TARGET
+```
+
+**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
+
 ## Red Team Walkthrough: IEC-104 Session Integrity
 
 **Exercise date:** 31 October 2026  
@@ -33,7 +54,7 @@ IEC 60870-5-104 I-format APDUs carry sequence values `N(S)` (send count) and `N(
 **Command (participant terminal):**
 
 ```bash
-nmap -Pn -sT -sV -p 2404,8095 <ip>
+nmap -Pn -sT -sV -p 2404,8095 "${TARGET}"
 ```
 
 **Why:** Identify the native IEC-104 listener and HMI without scanning unrelated infrastructure. `-Pn` skips host discovery; `-sT` uses the operating system's TCP connect; `-sV` probes service fingerprints. A fingerprint is not proof of IEC-104 correctness.
@@ -49,8 +70,8 @@ nmap -Pn -sT -sV -p 2404,8095 <ip>
 **TCP reachability and VPN route checks:** These confirm access to the assigned OT lab. `nc` verifies a socket can be opened; it does not authenticate an IEC-104 session. The route test confirms the network route, not an on-path foothold.
 
 ```bash
-nc -G 3 -vz <ip> 2404
-route -n get <ip>
+nc -G 3 -vz "${TARGET}" 2404
+route -n get "${TARGET}"
 ```
 
 ![R13 - TCP/2404 connectivity check](images/R13-Direct-TCP-Port-Test.png)
@@ -62,7 +83,7 @@ route -n get <ip>
 **Command:**
 
 ```bash
-curl -fsS http://<ip>:8095/api/state | python3 -m json.tool
+curl -fsS http://${TARGET}:8095/api/state | python3 -m json.tool
 ```
 
 **Why:** An attack impact can be assessed only relative to a known-good native-master state. `python3 -m json.tool` formats the returned JSON; it does not modify the lab.
@@ -80,7 +101,7 @@ curl -fsS http://<ip>:8095/api/state | python3 -m json.tool
 **Passive packet observation from the Mac (supporting reconnaissance, not the exploit):** The participant used `tcpdump` on the VPN interface to observe packets associated with the exposed IEC-104 endpoint. This proves traffic visibility on the participant's own connection; it does **not** establish access to the master/outstation internal traffic path.
 
 ```bash
-sudo tcpdump -i utun3 -nn -s 0 'host <ip> and tcp port 2404'
+sudo tcpdump -i utun3 -nn -s 0 "host ${TARGET} and tcp port 2404"
 ```
 
 ![R16 - Mac VPN capture setup](images/R16-VPN-TCPDump-Capture.png)
@@ -96,7 +117,7 @@ sudo tcpdump -i utun3 -nn -s 0 'host <ip> and tcp port 2404'
 **Command:**
 
 ```bash
-curl -fsS http://<ip>:8095/api/participant/apci/status | python3 -m json.tool
+curl -fsS http://${TARGET}:8095/api/participant/apci/status | python3 -m json.tool
 ```
 
 **Why:** This is an explicitly supplied exercise interface, not a discovered IEC-104 vulnerability. A status of `IDLE` indicates no bounded experiment is currently running; an administrator must have preconfigured the gateway for the participant VPN IP.
@@ -117,7 +138,7 @@ curl -fsS http://<ip>:8095/api/participant/apci/status | python3 -m json.tool
 
 ```bash
 curl -i -X POST \
-  http://<ip>:8095/api/participant/apci \
+  http://${TARGET}:8095/api/participant/apci \
   -H 'Content-Type: application/json' \
   -d '{"exercise":"SCENARIO04_APCI"}'
 ```
@@ -137,7 +158,7 @@ curl -i -X POST \
 **Command:**
 
 ```bash
-curl -fsS http://<ip>:8095/api/participant/apci/status | python3 -m json.tool
+curl -fsS http://${TARGET}:8095/api/participant/apci/status | python3 -m json.tool
 ```
 
 **Why:** Read-only experiment status helps correlate activity with downstream telemetry symptoms. The log identifiers are **runner reports**, not independent packet evidence.
@@ -157,8 +178,8 @@ curl -fsS http://<ip>:8095/api/participant/apci/status | python3 -m json.tool
 **Commands:**
 
 ```bash
-curl -fsS http://<ip>:8095/api/state | python3 -m json.tool
-curl -fsS http://<ip>:8095/api/incident | python3 -m json.tool
+curl -fsS http://${TARGET}:8095/api/state | python3 -m json.tool
+curl -fsS http://${TARGET}:8095/api/incident | python3 -m json.tool
 ```
 
 **Why:** Confirm the consequence on the **legitimate master**, not just the participant connection. An incident state alone does not establish the packet-level cause.
@@ -184,7 +205,7 @@ The platform's `Service-Availability-TTP.yml` is a **defender-side scoring check
 **Read-only recovery check:**
 
 ```bash
-curl -fsS http://<ip>:8095/api/state | python3 -m json.tool
+curl -fsS http://${TARGET}:8095/api/state | python3 -m json.tool
 ```
 
 **Observed after the test:** `DISPATCH_TELECONTROL_HEALTHY`, `telecontrol_online: true`, `DATA_RECEIVED` and a rising receive count. This recovery followed the bounded test ending; it was not caused by a demonstrated Blue Team containment action.
@@ -199,7 +220,7 @@ curl -fsS http://<ip>:8095/api/state | python3 -m json.tool
 
 ```bash
 curl -fsS \
-  http://<ip>:8095/api/incident/station-project.scd \
+  http://${TARGET}:8095/api/incident/station-project.scd \
   -o PU-DSS-IED-01.scd
 ```
 
@@ -224,3 +245,9 @@ grep -nE 'IED|AccessPoint|PTOC|PTRC|XCBR|MMXU|RREC|Communication|ConnectedAP' PU
 The logical-node search provides a compact visual hint for Scenario 05 without asserting that the file supplies an IP address or credentials.
 
 ![R28 - SCL IED and logical node identification](images/R28-SCL-Logical-Node-Grep.png)
+
+## Next scenario
+
+The incident-linked SCL engineering file identifies digital-substation IED `PU-DSS-IED-01` and its protection logical nodes, leading to Scenario 5.
+
+[Continue to Scenario 5](../../Scenario5/README.md)

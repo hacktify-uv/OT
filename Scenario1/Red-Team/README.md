@@ -1,5 +1,24 @@
 # Scenario 01: The Trusted Maintenance Window
 
+[Exercise overview](../../README.md) · [Scenario 1](../README.md) · [Other team](../Blue-Team/README.md)
+
+## Starting information
+
+This is the starting point: investigate the Unit-2 telemetry gateway and its maintenance controls.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+**Terminal setup:** In Bash or Zsh, enter the assigned address when prompted. Commands below use `TARGET`; replace `<ip>` with the same address in browser URLs and graphical clients.
+
+```bash
+printf "Assigned scenario address: "
+read -r TARGET
+export TARGET
+```
+
+**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
+
+
 **Prabal Urja Hydroelectric Power Station | Red Team practical write-up**
 
 **Exercise:** Unit-2 operations console and OPC UA telemetry gateway  
@@ -35,7 +54,7 @@ The Red Team objective was to determine whether an anonymous OPC UA client could
 On the Red Team machine, the relevant authorised ports are:
 
 ```bash
-nmap -Pn -sV -p 4840,8088 <ip>
+nmap -Pn -sV -p 4840,8088 "${TARGET}"
 ```
 
 - TCP **4840** is the OPC UA endpoint.
@@ -215,7 +234,7 @@ After all four maintenance inputs were set, the live HMI displayed:
 From a Bash-compatible terminal with `curl` and `jq` installed (Linux, macOS, WSL, or the exercise Ubuntu VM):
 
 ```bash
-curl -sS http://<ip>:8088/api/state | jq '{connected,channel_state,telemetry_quality,override_accepted,maintenance_ticket,freeze_telemetry,alarm_suppression,scenario_state,downstream_controller,southbound_protocol}'
+curl -sS http://${TARGET}:8088/api/state | jq '{connected,channel_state,telemetry_quality,override_accepted,maintenance_ticket,freeze_telemetry,alarm_suppression,scenario_state,downstream_controller,southbound_protocol}'
 ```
 
 The actual terminal response supplied during the exercise contained:
@@ -272,7 +291,7 @@ From a Bash-compatible terminal with `curl` and `jq` installed:
 
 ```bash
 for i in 1 2 3; do
-  curl -sS http://<ip>:8088/api/state | jq '{active_power_mw,frequency_hz,override_accepted}'
+  curl -sS http://${TARGET}:8088/api/state | jq '{active_power_mw,frequency_hz,override_accepted}'
   sleep 6
 done
 ```
@@ -306,3 +325,9 @@ After documenting the compromise, use the same OPC UA client (or another compati
 | `MaintenanceTicket` | Empty String |
 
 Refresh `OverrideAccepted` and `Health/ScenarioState`, then refresh the HMI. Expected normal-state values are `OverrideAccepted=false` and `ScenarioState=NORMAL_OPERATION`.
+
+## Next scenario
+
+Engineering metadata identifies `PU-GOV-PLC-02` and `Modbus/TCP`, leading to the governor investigation in Scenario 2.
+
+[Continue to Scenario 2](../../Scenario2/README.md)

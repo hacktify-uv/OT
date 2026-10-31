@@ -1,5 +1,24 @@
 # Prabal Urja | Scenario 02 - Red Team Walkthrough
 
+[Exercise overview](../../README.md) · [Scenario 2](../README.md) · [Other team](../Blue-Team/README.md)
+
+## Starting information
+
+Scenario 1 exposes the governor controller identifier `PU-GOV-PLC-02` and its Modbus/TCP protocol. Continue by examining that controller in this assigned scenario.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+**Terminal setup:** In Bash or Zsh, enter the assigned address when prompted. Commands below use `TARGET`; replace `<ip>` with the same address in browser URLs and graphical clients.
+
+```bash
+printf "Assigned scenario address: "
+read -r TARGET
+export TARGET
+```
+
+**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
+
+
 **Challenge:** Silent Generation Bias  
 **Target controller:** `PU-GOV-PLC-02`  
 **Protocol:** Real Modbus/TCP via OpenPLC, Unit ID `1`  
@@ -24,7 +43,7 @@ The following walkthrough describes the recorded successful test. New participan
 From the Red Team workstation, perform a narrow scan:
 
 ```bash
-nmap -Pn -sT -sV -p 502,8080,8090,8091,8443 <ip>
+nmap -Pn -sT -sV -p 502,8080,8090,8091,8443 "${TARGET}"
 ```
 
 **Why:** `-Pn` avoids relying on ping; `-sT` uses a TCP connect scan; `-sV` identifies application services; `-p` limits probes to the approved range ports. No broad OT scanning or brute force is needed.
@@ -36,7 +55,7 @@ nmap -Pn -sT -sV -p 502,8080,8090,8091,8443 <ip>
 Next, try the standard Nmap Modbus-discovery script:
 
 ```bash
-nmap -Pn -sT -p 502 --script modbus-discover <ip>
+nmap -Pn -sT -p 502 --script modbus-discover "${TARGET}"
 ```
 
 The running PLC returned a Modbus exception, `ILLEGAL FUNCTION` (exception `0x01`), to the discovery request. **This is not evidence that the PLC is broken**: support for one optional request does not prove support for all Modbus functions. A later FC03 holding-register read confirmed that the device was actually communicating.
@@ -65,7 +84,7 @@ The HMI at the beginning of this exercise showed:
 Validate the browser values using the live JSON API, rather than assuming the UI is accurate:
 
 ```bash
-curl -sS http://<ip>:8090/api/live
+curl -sS http://${TARGET}:8090/api/live
 ```
 
 The screenshot confirms `modbus_connected=true`, `setpoint_mw=650`, `actual_generation_mw=650`, `command_sequence=101`, `risk_state=0`.
@@ -79,14 +98,12 @@ The recorded exercise used **Netcat** to send native binary Modbus/TCP frames. T
 On **macOS** with the built-in `nc`, the successful command was:
 
 ```bash
-TARGET=<ip>
 printf '\x00\x01\x00\x00\x00\x06\x01\x03\x04\x00\x00\x06' | nc -G 3 -w 4 "$TARGET" 502 | hexdump -C
 ```
 
 On **Ubuntu/Linux**, replace the Netcat options with `nc -w 4 -q 1`. The exact `-G` option used above is specific to the macOS implementation and fails on the Ubuntu version used in the lab:
 
 ```bash
-TARGET=<ip>
 printf '\x00\x01\x00\x00\x00\x06\x01\x03\x04\x00\x00\x06' | nc -w 4 -q 1 "$TARGET" 502 | hexdump -C
 ```
 
@@ -188,7 +205,7 @@ The HMI later showed setpoint **720 MW**, actual simulated generation **720 MW**
 Confirm the attack using the independent simulator-health endpoint:
 
 ```bash
-curl -sS http://<ip>:8091/health
+curl -sS http://${TARGET}:8091/health
 ```
 
 The actual supplied result contained `scenario_state=GENERATION_BIAS_CONFIRMED`, `actual_generation_mw=720.0`, `transformer_loading_pct=98.05`, and `corridor_loading_pct=92.53`.
@@ -217,5 +234,11 @@ During the exercise, the operator console's **Intertie Coordination** panel iden
 The source also defines a read-only endpoint:
 
 ```bash
-curl -sS http://<ip>:8090/api/intertie
+curl -sS http://${TARGET}:8090/api/intertie
 ```
+
+## Next scenario
+
+The Intertie Coordination panel identifies River Bend RTU `PU-RB-RTU-07` and its feeder/bus-tie switching dependency, leading to Scenario 3.
+
+[Continue to Scenario 3](../../Scenario3/README.md)

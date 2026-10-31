@@ -1,5 +1,24 @@
 # Prabal Urja | Scenario 03: Rogue DNP3 Master
 
+[Exercise overview](../../README.md) · [Scenario 3](../README.md) · [Other team](../Blue-Team/README.md)
+
+## Starting information
+
+Scenario 2 identifies River Bend as the downstream switching dependency during corridor stress. Investigate its RTU and engineering point map.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+**Terminal setup:** In Bash or Zsh, enter the assigned address when prompted. Commands below use `TARGET`; replace `<ip>` with the same address in browser URLs and graphical clients.
+
+```bash
+printf "Assigned scenario address: "
+read -r TARGET
+export TARGET
+```
+
+**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
+
+
 ## Red Team Walkthrough
 
 **Environment:** River Bend 220/132 kV Substation  
@@ -25,7 +44,6 @@ The Red Team objective is to determine whether a workstation outside the legitim
 Set `TARGET` to the address allocated to this challenge instance:
 
 ```bash
-export TARGET="<ASSIGNED_SCENARIO_03_IP>"
 
 nmap -Pn -sT -p 20000,20001,8092 "$TARGET"
 ```
@@ -328,3 +346,9 @@ The page described the ownership record as verified against a live master heartb
 ![Figure 10. Verified Control Authority record identifying the dispatch centre and related telecontrol standard.](images/10-control-authority-register.png)
 
 *Figure 10. Verified Control Authority record identifying the dispatch centre and related telecontrol standard.*
+
+## Next scenario
+
+The Control Authority register identifies `PU-LDC-DNP3-MASTER-01`, Northern Load Dispatch Centre, and IEC 60870-5-104, leading to Scenario 4.
+
+[Continue to Scenario 4](../../Scenario4/README.md)

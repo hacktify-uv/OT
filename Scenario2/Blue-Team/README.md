@@ -1,5 +1,18 @@
 # Prabal Urja | Scenario 02 - Blue Team Investigation & Recovery
 
+[Exercise overview](../../README.md) · [Scenario 2](../README.md) · [Other team](../Red-Team/README.md)
+
+## Starting information
+
+Scenario 1 exposes the governor controller identifier `PU-GOV-PLC-02` and its Modbus/TCP protocol. Continue by examining that controller in this assigned scenario.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
+
+**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
+
+
 **Scenario:** Silent Generation Bias  
 **System:** `PU-GOV-PLC-02`, OpenPLC with native Modbus/TCP and pandapower process simulation  
 **Exercise host:** `<ip>` (participant-facing), TCP/502, operator console TCP/8090, simulator TCP/8091  
@@ -151,3 +164,9 @@ The operator-console screenshot taken later shows the simulator has settled at t
 | Command sequence | 104 (unchanged in supplied final screenshot) |
 
 ![FIGURE 10 - Operator console after confirmed operational recovery](images/11-restored-operator-console.png)
+
+## Next scenario
+
+The Intertie Coordination panel identifies River Bend RTU `PU-RB-RTU-07` and its feeder/bus-tie switching dependency, leading to Scenario 3.
+
+[Continue to Scenario 3](../../Scenario3/README.md)

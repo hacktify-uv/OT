@@ -1,5 +1,18 @@
 # Prabal Urja | Scenario 1 | Blue Team Investigation and Recovery
 
+[Exercise overview](../../README.md) · [Scenario 1](../README.md) · [Other team](../Red-Team/README.md)
+
+## Starting information
+
+This is the starting point: investigate the Unit-2 telemetry gateway and its maintenance controls.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
+
+**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
+
+
 **Challenge:** The Trusted Maintenance Window  
 **Evidence date:** 30 October 2026  
 **Affected asset:** `PU-OPCUA-GW-01`, Unit 2  
@@ -140,3 +153,9 @@ curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 sleep 8
 curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 ```
+
+## Next scenario
+
+Engineering metadata identifies `PU-GOV-PLC-02` and `Modbus/TCP`, leading to the governor investigation in Scenario 2.
+
+[Continue to Scenario 2](../../Scenario2/README.md)

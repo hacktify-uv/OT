@@ -1,5 +1,18 @@
 # Prabal Urja | Scenario 03: Rogue DNP3 Master
 
+[Exercise overview](../../README.md) · [Scenario 3](../README.md) · [Other team](../Red-Team/README.md)
+
+## Starting information
+
+Scenario 2 identifies River Bend as the downstream switching dependency during corridor stress. Investigate its RTU and engineering point map.
+
+Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
+
+Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
+
+**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
+
+
 ## Blue Team Investigation and Recovery Runbook
 
 > **Scope and integrity:** This report concerns the authorised Prabal Urja simulated OT environment. It records what the Blue Team actually observed and separates proposed response actions from completed actions. The equipment, electrical loading and alarms are simulator outputs, not claims about a physical substation.
@@ -226,3 +239,9 @@ curl -fsS http://<ip>:8093/health | jq .
 curl -fsS http://<ip>:8092/api/health | jq .
 systemctl is-active prabal-dnp3-outstation.service   prabal-dnp3-master.service   prabal-riverbend-process.service   prabal-riverbend-console.service
 ```
+
+## Next scenario
+
+The Control Authority register identifies `PU-LDC-DNP3-MASTER-01`, Northern Load Dispatch Centre, and IEC 60870-5-104, leading to Scenario 4.
+
+[Continue to Scenario 4](../../Scenario4/README.md)
