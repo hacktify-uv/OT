@@ -9,6 +9,8 @@
 
 > **Analyst instructions.** Begin with an alert describing a failed protection response, not with knowledge of the attacker's commands. Use monitoring data, native event records and engineering baselines. Do not reproduce the Red Team MMS write from the SOC workstation. Every screenshot labelled **real** is an image supplied during this investigation. Items marked **placeholder** are pending evidence and must not be represented as completed actions.
 
+> **Screenshot audit (31 October 2026):** The source conversation provides **7 genuine Red Team screenshots and 7 genuine Blue Team SOC screenshots**. The Blue Team document embeds all seven supplied investigation captures at the point of use. Source attribution, a real SIEM alert, and restored relay output remain uncaptured.
+
 ## 1. Incident intake
 
 **Illustrative analyst-facing alert (scenario narrative, not an observed SIEM alert):**
@@ -153,7 +155,7 @@ sudo grep -n 'SettingControl' /opt/prabal-urja/scenario5/engineering/PU-DSS-IED-
 Incident category: OT protection engineering configuration deviation
 Affected asset: PU-DSS-IED-01
 Impact confirmed: 1300 A simulated overcurrent did not trip in group 2
-Evidence: native relay-state snapshot, logged group-2 event, test event, SCL baseline
+Evidence: native relay-state snapshot, signed group-2 event, test event, SCL baseline
 Confidence: high for the setting change and simulator effect
 Attribution: unconfirmed, no historical PCAP or source-IP event field
 Approval status: unconfirmed, needs change-management review

@@ -1,3 +1,4 @@
 # Scenario 4
 
-Writeups and images have not been supplied yet.
+- [Red Team writeup](Red-Team/README.md)
+- [Blue Team SOC writeup](Blue-Team/README.md)
