@@ -205,8 +205,6 @@ This is deliberately different from a service crash. The OpenPLC Modbus/TCP list
 
 **Evidence limitation:** The supplied screenshots contain the simulator's confirmed attack state and the participant's report that scoring was DOWN; they do **not** contain a captured Scenario 2 TTP output demonstrating exit code `1` or the dashboard's actual deduction. Capture this separately if it is required by the assessor.
 
-<!-- IMAGE PLACEHOLDER 12: Capture the corrected Scenario 2 TTP producing SERVICE_STATUS:DOWN and exit code 1. Suggested name: images/12-service-ttp-down.png -->
-
 ## 9. Discovery of the next scenario (Scenario 2 to 3)
 
 During the exercise, the operator console's **Intertie Coordination** panel identified:

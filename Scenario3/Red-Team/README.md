@@ -167,8 +167,6 @@ Closing the bus tie creates an alternate simulated supply path between the bus s
 
 This sequence is inferred from the single-line view and the published point mapping, not supplied by the engineering document itself.
 
-> **Evidence placeholder (baseline display):** A separate pre-attack single-line screenshot was not supplied. Baseline breaker positions are supported by the recorded DNP3 poll and the documented normal state.
-
 ## 6. Operation 1: Close the bus tie
 
 The engineering register maps the bus tie to **binary output index `1`**. Submit a DNP3 Control Relay Output Block (CROB) using Select-Before-Operate (SBO):
@@ -217,7 +215,6 @@ The process record described the source IP as `unattributed`; it should not be p
 ![Figure 05. DNP3 Select-Before-Operate command acknowledged for bus-tie close.](images/05-bus-tie-sbo-close.png)
 
 *Figure 05. DNP3 Select-Before-Operate command acknowledged for bus-tie close.*
-> **Evidence placeholder (intermediate state):** A standalone image of `PARALLEL_BUS_CONFIGURATION` was not supplied. The observed process-state output is recorded immediately above.
 
 ## 7. Operation 2: Open Feeder A
 
@@ -316,8 +313,6 @@ SERVICE_STATUS:DOWN | REASON:ROGUE_MASTER_ATTACK_CONFIRMED
 This was observed after the two applied controls. The `DOWN` result means that **process integrity is compromised**; it does not mean the DNP3 TCP listener or HMI has necessarily stopped running.
 
 The availability check is run by the **CTF platform**, not by the Red Team participant. No server-side validator, private API or local challenge script is needed to perform the attack.
-
-> **Evidence placeholder (CTF scoring):** The recorded Service Availability output is reproduced above. No standalone scoring screenshot was supplied.
 
 ## 10. Follow the control-authority evidence
 

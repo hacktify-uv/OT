@@ -242,12 +242,6 @@ The logical-node search provides a compact visual hint for Scenario 05 without a
 | Was a modified `N(S)` independently seen at the master? | Not in the preserved defender PCAPs | **Not independently proven** |
 | Did the Scenario 05 handoff work? | Yes, SCL engineering file downloaded | Directly observed |
 
-<!-- IMAGE PLACEHOLDER R11: Replace with an actual CTF scoring output captured while service availability is DOWN. The included file is a labelled placeholder, NOT evidence. -->
-![R11 - PLACEHOLDER ONLY: live scoring dashboard output](images/R11-PLACEHOLDER-Scoring-Down.png)
-
-<!-- IMAGE PLACEHOLDER R12: Optional independent post-modification master-side capture with altered N(S). Do not label ordinary APCI frames as modified. -->
-![R12 - PLACEHOLDER ONLY: packet-level proof if separately acquired](images/R12-PLACEHOLDER-Post-Modification-PCAP.png)
-
 **Conclusion:** In the isolated training range, the fixed gateway-triggered APCI experiment was followed by genuine IEC-104 telemetry loss, master disconnections and recovery after the test ended. The engineering project provided the Scenario 05 asset clue. The package demonstrates **contained lab impact**, not acquisition of an attacker-controlled network position from the Mac.
 
 ### Notes for the instructor / handover
@@ -255,7 +249,5 @@ The logical-node search provides a compact visual hint for Scenario 05 without a
 - The participant uses the **Mac/VPN commands above**. Preparing the attack virtual environment or installing the helper service is **administrator work**, not a Red Team exploit step.
 - Fresh-install `setup.sh` must install the APCI dependencies, gateway service and configured VPN allowlist. The prior live environment needed manual dependency preparation. Syntax-only validation is insufficient.
 - Do not publish the gateway externally, expose arbitrary command arguments or claim it represents a production IEC-104 weakness.
-- When reusing these Markdown files, keep the `images/` folder alongside this file. Replace the two explicitly labelled placeholder images only with genuine captures.
-
 
 ---

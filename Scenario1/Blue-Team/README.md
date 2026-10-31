@@ -173,10 +173,7 @@ Finally rerun the corrected **Service Availability TTP** from the CTF dashboard.
 SERVICE_STATUS:UP | REASON:NORMAL_OPERATION | OPCUA_PROBE:PASS | HMI_PROBE:PASS
 ```
 
-The expected exit code is `0`. Actual recovery output and dashboard score adjustment remain to be captured. Keep those as explicit evidence placeholders rather than presenting them as verified.
-
-**[IMAGE PLACEHOLDER 10: Add recovered HMI/API screenshot here]**
-**[IMAGE PLACEHOLDER 11: Add final TTP UP/dashboard screenshot here]**
+The expected exit code is `0`. Actual recovery output and dashboard score adjustment remain to be captured.
 
 ## 10. Blue Team conclusion
 

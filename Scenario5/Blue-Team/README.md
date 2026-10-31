@@ -7,7 +7,7 @@
 **Analyst role:** SOC / OT incident response, not an attacking IEC 61850 client  
 **Observed outcome:** Incident reconstructed and evidence preserved; final operator recovery/retest not captured in the provided conversation
 
-> **Analyst instructions.** Begin with an alert describing a failed protection response, not with knowledge of the attacker's commands. Use monitoring data, native event records and engineering baselines. Do not reproduce the Red Team MMS write from the SOC workstation. Every screenshot labelled **real** is an image supplied during this investigation. Items marked **placeholder** are pending evidence and must not be represented as completed actions.
+> **Analyst instructions.** Begin with an alert describing a failed protection response, not with knowledge of the attacker's commands. Use monitoring data, native event records and engineering baselines. Do not reproduce the Red Team MMS write from the SOC workstation. Every screenshot labelled **real** is an image supplied during this investigation.
 
 > **Screenshot audit (31 October 2026):** The source conversation provides **7 genuine Red Team screenshots and 7 genuine Blue Team SOC screenshots**. The Blue Team document embeds all seven supplied investigation captures at the point of use. Source attribution, a real SIEM alert, and restored relay output remain uncaptured.
 
@@ -58,8 +58,6 @@ The local directory holds a snapshot of the relay state, event log, journald exp
 ![Figure B02. Evidence directory and SHA-256 manifest created.](images/blue-02-evidence-collection.png)
 
 **Suggested additional evidence hardening (not recorded):** record analyst identity, host clock, acquisition time, original file metadata and destination custody, then copy evidence off-host to a restricted case repository.
-
-> **[IMAGE PLACEHOLDER B00]** `images/blue-00-case-intake.png` - real case-management/alert view, if later implemented. Do not replace with an invented Wazuh alert.
 
 ## 4. Correlate the relay's native event log
 
@@ -113,8 +111,6 @@ sudo tshark -r /tmp/s05-soc-mms.pcap -Y mms -T fields -e frame.time -e ip.src -e
 
 A late-started empty capture does not prove the attacker used no network connection. **There is insufficient historical network evidence to attribute this attack to a particular Mac IP**. Do not back-fill a guessed source IP into the incident report. Future exercises should run a rolling capture or deploy switch/TAP/SPAN monitoring before Red Team activity.
 
-> **[IMAGE PLACEHOLDER B06]** `images/blue-06-historical-mms-pcap.png` - packet capture, with verified timestamps and source/destination, collected while the incident actually occurs. Not available in the recorded exercise.
-
 ## 6. Review service logs without inventing telemetry
 
 The analyst queried journald for the selected incident window:
@@ -144,8 +140,6 @@ sudo grep -n 'SettingControl' /opt/prabal-urja/scenario5/engineering/PU-DSS-IED-
 ![Figure B08. SCL file declares two groups and initial actSG=1.](images/blue-07-scl-baseline.png)
 
 **Meaning:** the declared initial active group is 1, while the running system was observed in group 2. This supports a configuration-deviation finding. **Approval records were not provided**. The analyst should request the protection commissioning/change ticket, responsible engineer, authorisation window and corresponding work order. Until these are checked, classify the event as **suspected unauthorised engineering activity**, not conclusively attributable malicious action.
-
-> **[IMAGE PLACEHOLDER B09]** `images/blue-09-change-approval-check.png` - actual ticketing/change-approval lookup and its result. No such record was supplied.
 
 ## 8. Incident declaration and containment decision
 
@@ -186,8 +180,6 @@ sudo jq '{active_setting_group,threshold_amps,protection_trip,breaker_closed}' /
 
 Expected after the reset: group `1`, threshold `800`, protection trip `false`, breaker closed `true`.
 
-> **[IMAGE PLACEHOLDER B10]** `images/blue-10-restoration-evidence.png` - real output from authorised `blue_restore.sh`, systemd status and group-1 state. Not supplied yet.
-
 ## 10. Independently verify recovered protection
 
 **Instructor / authorised OT engineer only:**
@@ -206,9 +198,7 @@ SERVICE_STATUS:UP | REASON:PROTECTION_ACTIVE
 
 **Scoring caveat:** The inline TTP can return `UP` solely because the previous group-2 suppression predicate is no longer true. Therefore, the SOC must preserve the actual successful-trip record separately; `UP` by itself is not proof of recovered protection. Once captured and approved, the operator can clear the latched trip by returning the simulator to its normal state using the approved reset method.
 
-> **[IMAGE PLACEHOLDER B11]** `images/blue-11-1300a-recovery-trip.png` - successful 1300 A trip in group 1 and the relay's observed response. Not supplied yet.
 >
-> **[IMAGE PLACEHOLDER B12]** `images/blue-12-final-service-up.png` - final scorer output and rechecked native MMS service after operator recovery. Not supplied yet.
 
 ## 11. Recommendations and remaining detection gaps
 

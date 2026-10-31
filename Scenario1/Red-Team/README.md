@@ -47,8 +47,6 @@ nmap -Pn -sV -p 4840,8088 <ip>
 
 Open `http://<ip>:8088/` and capture the state **before** any writes. The observed baseline was `NORMAL_OPERATION`, maintenance `INACTIVE`, channel `ONLINE`, override `NOT ACCEPTED`, and data quality `GOOD`.
 
-<!-- IMAGE SLOT 04: Operator HMI before the attack, with normal channel and telemetry quality. Replace with your own screenshot if needed. -->
-
 ![Figure 04. Operator HMI before the attack, with normal channel and telemetry quality.](images/04-hmi-normal-operation.png)
 
 *Figure 04. Operator HMI before the attack, with normal channel and telemetry quality.*
@@ -63,21 +61,15 @@ opc.tcp://<ip>:4840
 
 Choose **Security Mode: None** and **User Authentication: Anonymous**, because those options were offered by this specific lab server. Do not assume that other OPC UA deployments permit them.
 
-<!-- IMAGE SLOT 01: Prosys security settings with Security Mode None selected. Replace with your own screenshot if needed. -->
-
 ![Figure 01. Prosys security settings with Security Mode None selected.](images/01-security-none.png)
 
 *Figure 01. Prosys security settings with Security Mode None selected.*
-
-<!-- IMAGE SLOT 02: Anonymous authentication selected in Prosys OPC UA Browser. Replace with your own screenshot if needed. -->
 
 ![Figure 02. Anonymous authentication selected in Prosys OPC UA Browser.](images/02-anonymous-authentication.png)
 
 *Figure 02. Anonymous authentication selected in Prosys OPC UA Browser.*
 
 Click **OK** and wait for the client status to show **Running** with the open62541-based application connected.
-
-<!-- IMAGE SLOT 03: Live open62541 server connection and expanded Unit2 address space. Replace with your own screenshot if needed. -->
 
 ![Figure 03. Live open62541 server connection and expanded Unit2 address space.](images/03-connected-address-space.png)
 
@@ -105,8 +97,6 @@ Objects
 
 Expand **EngineeringMetadata**. Select `LastApprovedWorkOrder`, then read its **Value** field in **Attributes and References**. The observed value was `PU-MW-0427` and its `AccessLevel` was `CurrentRead` only.
 
-<!-- IMAGE SLOT 05: LastApprovedWorkOrder returns PU-MW-0427 as read-only engineering metadata. Replace with your own screenshot if needed. -->
-
 ![Figure 05. LastApprovedWorkOrder returns PU-MW-0427 as read-only engineering metadata.](images/05-approved-work-order.png)
 
 *Figure 05. LastApprovedWorkOrder returns PU-MW-0427 as read-only engineering metadata.*
@@ -128,8 +118,6 @@ OverrideAccepted
 TelemetryQuality
 ```
 
-<!-- IMAGE SLOT 06: TelemetryGateway exposes maintenance variables in the server namespace. Replace with your own screenshot if needed. -->
-
 ![Figure 06. TelemetryGateway exposes maintenance variables in the server namespace.](images/06-telemetry-gateway-nodes.png)
 
 *Figure 06. TelemetryGateway exposes maintenance variables in the server namespace.*
@@ -149,13 +137,9 @@ All actions below were performed on the isolated Scenario 1 exercise server. In 
 3. Click **Write**. Re-select the variable and press the orange **Refresh** button.
 4. Confirm the server returns `Value = PU-MW-0427`.
 
-<!-- IMAGE SLOT 07: MaintenanceTicket write dialog with the discovered work-order reference. Replace with your own screenshot if needed. -->
-
 ![Figure 07. MaintenanceTicket write dialog with the discovered work-order reference.](images/07-maintenance-ticket-entry.png)
 
 *Figure 07. MaintenanceTicket write dialog with the discovered work-order reference.*
-
-<!-- IMAGE SLOT 08: MaintenanceTicket returns PU-MW-0427 after the write. Replace with your own screenshot if needed. -->
 
 ![Figure 08. MaintenanceTicket returns PU-MW-0427 after the write.](images/08-maintenance-ticket-readback.png)
 
@@ -169,15 +153,11 @@ All actions below were performed on the isolated Scenario 1 exercise server. In 
 2. Tick the Boolean checkbox to select **True**; click **Write**.
 3. Refresh the variable to verify its value.
 
-<!-- IMAGE SLOT 09: Prosys dialog selecting True for MaintenanceMode. Replace with your own screenshot if needed. -->
-
 ![Figure 09. Prosys dialog selecting True for MaintenanceMode.](images/09-maintenance-mode-true.png)
 
 *Figure 09. Prosys dialog selecting True for MaintenanceMode.*
 
 The HMI then showed maintenance **ACTIVE**, the channel as `MAINTENANCE_PENDING` and work order `PU-MW-0427`, while the override remained **NOT ACCEPTED**. This is important intermediate evidence: setting maintenance mode alone did **not** complete the objective.
-
-<!-- IMAGE SLOT 10: HMI shows maintenance active, valid work order and maintenance-pending channel. Replace with your own screenshot if needed. -->
 
 ![Figure 10. HMI shows maintenance active, valid work order and maintenance-pending channel.](images/10-hmi-maintenance-pending.png)
 
@@ -188,8 +168,6 @@ The HMI then showed maintenance **ACTIVE**, the channel as `MAINTENANCE_PENDING`
 1. Right-click `FreezeTelemetry` → **Write Value…**.
 2. Select Boolean **True**, click **Write** and refresh.
 3. The read-back showed `FreezeTelemetry = true`.
-
-<!-- IMAGE SLOT 11: FreezeTelemetry reads back true through OPC UA. Replace with your own screenshot if needed. -->
 
 ![Figure 11. FreezeTelemetry reads back true through OPC UA.](images/11-freeze-telemetry-readback.png)
 
@@ -203,13 +181,9 @@ The HMI then showed maintenance **ACTIVE**, the channel as `MAINTENANCE_PENDING`
 2. Select Boolean **True**, click **Write** and refresh.
 3. The read-back showed `AlarmSuppression = true`.
 
-<!-- IMAGE SLOT 12: Prosys dialog selecting True for AlarmSuppression. Replace with your own screenshot if needed. -->
-
 ![Figure 12. Prosys dialog selecting True for AlarmSuppression.](images/12-alarm-suppression-true.png)
 
 *Figure 12. Prosys dialog selecting True for AlarmSuppression.*
-
-<!-- IMAGE SLOT 13: AlarmSuppression reads back true through OPC UA. Replace with your own screenshot if needed. -->
 
 ![Figure 13. AlarmSuppression reads back true through OPC UA.](images/13-alarm-suppression-readback.png)
 
@@ -229,8 +203,6 @@ After all four maintenance inputs were set, the live HMI displayed:
 | Freeze Request | `YES` |
 | Alarm Suppression | `YES` |
 | Scenario State | `UNAUTHORISED_MAINTENANCE_OVERRIDE` |
-
-<!-- IMAGE SLOT 14: HMI confirms MAINTENANCE_HOLD and UNAUTHORISED_MAINTENANCE_OVERRIDE. Replace with your own screenshot if needed. -->
 
 ![Figure 14. HMI confirms MAINTENANCE_HOLD and UNAUTHORISED_MAINTENANCE_OVERRIDE.](images/14-hmi-override-accepted.png)
 

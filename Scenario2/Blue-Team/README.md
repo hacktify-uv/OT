@@ -192,8 +192,6 @@ Run the **corrected** Scenario 2 Service Availability TTP through the CTF platfo
 curl -sS http://<ip>:8091/health | jq '{setpoint_mw,actual_generation_mw,transformer_loading_pct,corridor_loading_pct,risk_state,scenario_state}'
 ```
 
-<!-- IMAGE PLACEHOLDER 11: Add screenshot of the final corrected TTP output showing SERVICE_STATUS:UP and exit code 0. Suggested filename: images/12-final-ttp-up.png -->
-
 **Scoring design caveat:** In the intermediate recovery screenshot the simulator reported `NORMAL_DISPATCH` while generation remained at 712.17 MW and risk was stressed. If the TTP checks only `scenario_state`, it can return `UP` prematurely. For accurate Blue Team scoring, include safe operating thresholds or a sustained healthy-recovery state in the TTP. This improvement was identified, but a revised live scoring result is not present in the evidence supplied here.
 
 ## 9. Blue Team findings and scope

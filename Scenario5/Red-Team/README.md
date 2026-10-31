@@ -10,8 +10,6 @@
 
 > **Scope and accuracy.** This is a reproducible walkthrough of the actual isolated Prabal Urja lab. The commands and output described as **observed** came from the user's screenshots or terminal results. Commands labelled **recommended**, **optional**, or **instructor-only** must not be represented as actions captured during the original attack. It is a simulated IED running libIEC61850, not a real utility relay or a disclosed vendor vulnerability. The original package does not implement electrical islanding or GOOSE exploitation.
 
-> **Screenshot audit (31 October 2026):** The source conversation provides **7 genuine Red Team screenshots and 7 genuine Blue Team SOC screenshots**. They are all embedded below at their corresponding steps. **No Nmap screenshot was supplied** with the recorded Scenario 5 messages, so the Nmap section contains a visibly labelled placeholder, not a fabricated result. Please replace it with your real scan capture if you have it.
-
 ## 1. Scenario and objective
 
 A digital substation relay monitors a modelled feeder. An approved protection setting group (group 1) uses an overcurrent threshold of **800 A**. A second commissioning setting group (group 2) uses **1600 A**. The simulated relay accepts activation of another setting group through IEC 61850 MMS without independently checking commissioning approval. This creates an engineering-authorisation weakness.
@@ -49,8 +47,6 @@ The exercise started from the Mac, not from an interactive shell on the Ubuntu I
 
 **On other operating systems:** Select an asset matching the operating system and CPU architecture from the upstream release listing, verify its supplied checksum, and execute the tool locally. Windows/Linux commands are not claimed as tested during this Mac-based run. Do not rename an ARM64 binary as AMD64 or assume the same shell syntax across platforms.
 
-> **[IMAGE PLACEHOLDER R00]** `images/red-00-tool-install-verification.png` - Mac terminal displaying the matching SHA-256 checksum and `iec61850ctl version: 0.6.0`. Screenshot not supplied as an image; capture or insert later.
-
 ## 3. Reconnaissance: identify the service
 
 **Required first reconnaissance step for the final participant write-up. Not present in the original screenshot set:** from the Mac, run a narrow authorised Nmap service scan against the allocated scenario host.
@@ -60,12 +56,6 @@ nmap -Pn -sT -p 102,8098 --reason <ip>
 ```
 
 **Why:** Identify whether the IEC 61850 MMS port is reachable and whether the simulated operator view is exposed. `-Pn` avoids reliance on ICMP discovery when the lab blocks ping; `-sT` uses a TCP connect scan; `-p` limits scope to the two relevant ports. Nmap alone cannot prove IEC 61850 application communication.
-
-**Figure R01 is deliberately pending.** The real Nmap output was not attached in the recorded Scenario 5 sequence. This **must be the first attack-side reconnaissance screenshot** when you capture the final walkthrough. The live run started with `nc` followed by native MMS discovery; therefore we cannot present a later Nmap scan as if it was originally captured.
-
-![Figure R01. PLACEHOLDER ONLY: add a genuine Mac Nmap scan screenshot here.](images/red-00-nmap-PENDING.png)
-
-> **Replacement instruction:** Save your actual Terminal screenshot as `images/red-00-nmap-scan.png`, replace the Markdown link above with that filename, and remove `red-00-nmap-PENDING.png`. The expected ports must not be reported as observed until checked.
 
 **Observed TCP connectivity and native MMS discovery (the recorded live exercise started here):**
 

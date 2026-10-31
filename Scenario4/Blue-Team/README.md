@@ -282,9 +282,4 @@ systemctl is-active prabal-s04-participant-gateway.service
 
 **Recovery evidence and scope:** A healthy master state was observed later. A separate post-containment recovery-verification command/screenshot was intentionally **omitted** from this write-up. Do not claim stopping the gateway caused the earlier automatic recovery.
 
-**Optional missing capture:** If a future exercise takes a trustworthy **post-NFQUEUE, master-side** capture with altered `N(S)`, replace the clearly marked placeholder below. Do not replace it with an unrelated normal IEC-104 stream.
-
-<!-- IMAGE PLACEHOLDER B14: Optional independent master-ingress packet proof; not captured in this case. This is NOT an actual screenshot. -->
-![B14 - PLACEHOLDER ONLY: post-modification APCI evidence](images/B14-PLACEHOLDER-Master-Side-APCI-Proof.png)
-
 **Closure summary:** Classify as **confirmed training-range IEC-104 telemetry disruption**, with **runner-reported APCI modifications** and a **strongly correlated authorised gateway trigger**. Preserve service logs, PCAPs and hashes as the audit trail. The investigation does not claim a production OT attack, a verified independent network foothold, or a permanent production hardening fix.
