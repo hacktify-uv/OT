@@ -199,18 +199,3 @@ SERVICE_STATUS:UP | REASON:PROTECTION_ACTIVE
 **Scoring caveat:** The inline TTP can return `UP` solely because the previous group-2 suppression predicate is no longer true. Therefore, the SOC must preserve the actual successful-trip record separately; `UP` by itself is not proof of recovered protection. Once captured and approved, the operator can clear the latched trip by returning the simulator to its normal state using the approved reset method.
 
 >
-
-## 11. Recommendations and remaining detection gaps
-
-| Gap / weakness | Defensible improvement | Current evidence |
-|---|---|---|
-| No independent engineering approval | Enforce approved change ticket / identity / two-person rule in setting-group activation | Source callback accepts group 1 or 2 |
-| Events omit actor and source IP | Add source endpoint, authenticated engineering principal, request ID, before/after group | JSONL records only epoch, event, active group, value |
-| No historical MMS packets | Always-on bounded capture at permitted network vantage | Zero packets in late capture |
-| No configured SOC SIEM | Forward relay JSONL to a central collector with decoder/rules | Only local `jq` investigation observed |
-| Restart-based restoration | Document control-room approval and planned MMS interruption | `blue_restore.sh` restarts the service |
-| TTP lacks independent recovery proof | Include test-event trip confirmation in recovery acceptance gate | Current `UP` predicate alone insufficient |
-
-## 12. SOC case status
-
-**Investigation findings verified:** group 2 selected by MMS at 07:34:22 UTC, threshold 1600 A and failed-to-trip simulated 1300 A event at 07:41:26 UTC, preserved original event records, initial approved group 1 documented in SCL, and acknowledged source-attribution gap. **Still pending for case closure:** approval-record review, confirmed source identity, operator restoration output, independent successful trip under group 1, final post-recovery service verification. The incident should remain open pending these recovery and governance checks.

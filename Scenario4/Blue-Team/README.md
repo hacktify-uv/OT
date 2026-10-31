@@ -273,13 +273,3 @@ systemctl is-active prabal-s04-participant-gateway.service
 **Observed:** `inactive`.
 
 ![B13 - Participant gateway stopped](images/B13-SOC-Containment.png)
-
-### 10. Final SOC finding and case closure notes
-
-**Confirmed:** Legitimate SCADA communication became unstable, packet resets and master disconnection logs agree, and a fixed lab exercise was requested immediately before the 08:30 disruption. The participant gateway was subsequently disabled by the defender.
-
-**Not confirmed from these PCAPs:** The exact modified APCI I-frame bytes observed at the master's ingress; none of the inspected defender captures produced the large sequence jump the lab runner reported.
-
-**Recovery evidence and scope:** A healthy master state was observed later. A separate post-containment recovery-verification command/screenshot was intentionally **omitted** from this write-up. Do not claim stopping the gateway caused the earlier automatic recovery.
-
-**Closure summary:** Classify as **confirmed training-range IEC-104 telemetry disruption**, with **runner-reported APCI modifications** and a **strongly correlated authorised gateway trigger**. Preserve service logs, PCAPs and hashes as the audit trail. The investigation does not claim a production OT attack, a verified independent network foothold, or a permanent production hardening fix.

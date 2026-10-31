@@ -193,13 +193,3 @@ curl -sS http://<ip>:8091/health | jq '{setpoint_mw,actual_generation_mw,transfo
 ```
 
 **Scoring design caveat:** In the intermediate recovery screenshot the simulator reported `NORMAL_DISPATCH` while generation remained at 712.17 MW and risk was stressed. If the TTP checks only `scenario_state`, it can return `UP` prematurely. For accurate Blue Team scoring, include safe operating thresholds or a sustained healthy-recovery state in the TTP. This improvement was identified, but a revised live scoring result is not present in the evidence supplied here.
-
-## 9. Blue Team findings and scope
-
-**Confirmed root cause in this lab:** The Modbus/TCP control path accepts reachable clients' permitted holding-register writes without authenticated-master authorisation. The governor control state changes and the pandapower simulator responds with a genuine calculated loading change.
-
-**Verified:** OpenPLC and simulator functioning; Red Team's external FC06 write requests; application event chronology; sustained overload; evidence collection; 650 MW recovery; normal process/console values at end.
-
-**Not verified:** Final scoring TTP return to `UP`; real-world operator identity behind `<ip>`; native interconnection to Scenario 3. The console displays River Bend RTU identifier `PU-RB-RTU-07`, but that does not prove that the DNP3 endpoint is reachable.
-
-**Exercise recovery scope:** No hardening, allowlist, firewall change, or challenge reset is included, per exercise requirements. This makes the simulated attack repeatable; it is not a recommended production incident-response stopping point.

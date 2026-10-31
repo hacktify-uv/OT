@@ -174,9 +174,3 @@ SERVICE_STATUS:UP | REASON:NORMAL_OPERATION | OPCUA_PROBE:PASS | HMI_PROBE:PASS
 ```
 
 The expected exit code is `0`. Actual recovery output and dashboard score adjustment remain to be captured.
-
-## 10. Blue Team conclusion
-
-**Verified:** The Scenario 1 Red Team operation caused a genuine OPC UA application-state change; the operator telemetry was frozen and alarms were suppressed within the simulated application. The investigation preserved supporting audit, process and packet-capture evidence. Service uptime alone was not an appropriate measure of process integrity.
-
-**Pending:** Proven source attribution, successful recovery test, scoring dashboard confirmation and a verified network transition to Scenario 2. The engineering metadata identifies `PU-GOV-PLC-02` and `Modbus/TCP` but does not independently establish that the controller is reachable.

@@ -265,21 +265,3 @@ curl -fsS http://<ip>:8093/health | jq .
 curl -fsS http://<ip>:8092/api/health | jq .
 systemctl is-active prabal-dnp3-outstation.service   prabal-dnp3-master.service   prabal-riverbend-process.service   prabal-riverbend-console.service
 ```
-
-## 10. Case status and handoff
-
-| Work item | Evidence-backed status |
-|---|---|
-| Compromised breaker state and simulated overload | **Verified** |
-| Two applied DNP3 switching controls | **Verified** |
-| Evidence archive created | **Verified** |
-| TCP flows during the incident | **Verified** |
-| Decoded DNP3 control frames from PCAP | **Not verified** |
-| Original attacker workstation IP | **Not attributed** |
-| Web document accessible through `robots.txt` | **Verified after original attack** |
-| Original website access log sequence | **Not captured** |
-| Containment firewall applied | **Pending** |
-| Approved topology restored | **Pending** |
-| CTF availability returned to `UP` | **Pending** |
-
-**Conclusion:** The Blue Team has detected the unauthorised switching, confirmed operational impact, preserved an incident archive, correlated two network connections with the switching timeline and verified that the legitimate master remains functional. The case is **not closed** until containment, process restoration and recovery scoring are executed and captured as evidence.

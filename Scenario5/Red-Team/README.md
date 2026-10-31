@@ -190,7 +190,3 @@ The original distributed TTP evaluated the native MMS read together with the ind
 The lab server's `active_changed` callback accepts setting-group values 1 or 2, but does not inspect an approved engineering-change ticket, role, time window or authorised source identity. Its SCL configuration declares two groups with `actSG="1"` as the initial approved group. This is a **weak engineering change-authorisation design**, not a protocol parsing flaw. Write attempts using an inconsistent MMS type were correctly rejected, while the syntactically valid but unauthorised group change succeeded.
 
 For a production analogue, protection-engineering accounts should have independent authorisation and approved-change tracking; the security-monitoring stack should collect who/what initiated a change, the IED, before/after group, timestamp, and measured process consequence. Network filtering and MMS encryption, if available, are supporting controls, not substitutes for change approval.
-
-## 10. End-of-exercise result
-
-**Verified in the recorded exercise:** remote MMS access, logical-node enumeration, accepted group 2 activation, readback of the active group and 1600 A threshold, failed-to-trip 1300 A simulated fault, and service-availability `DOWN` with `PROTECTION_RESPONSE_SUPPRESSED`. **Not verified:** GOOSE, islanding, a real protection relay, or source-IP attribution from a captured MMS session. The Red Team's technical objective is achieved within this contained training range.
