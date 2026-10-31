@@ -17,7 +17,7 @@
 
 ---
 
-### 01. Alert intake and initial triage
+### 1. Alert intake and initial triage
 
 **Read-only commands (defender VM):**
 
@@ -40,7 +40,7 @@ curl -fsS http://<ip>:8095/api/incident | python3 -m json.tool
 
 **Important:** The retained incident's `recorded_at_epoch` converts to **31 October 2026 08:03:17 UTC**. It precedes the separately observed **08:30:13** gateway trigger. The earlier record cannot by itself be used to establish the 08:30 incident timeline.
 
-### 02. Open a SOC case and preserve initial state
+### 2. Open a SOC case and preserve initial state
 
 **Commands:**
 
@@ -53,10 +53,7 @@ CASE="$(cat /root/s04-soc-case-path.txt)"
 date -Is > "$CASE/evidence/collection-time.txt"
 curl -fsS http://<ip>:8095/api/state > "$CASE/evidence/scada-state.json"
 curl -fsS http://<ip>:8095/api/incident > "$CASE/evidence/incident-record.json"
-sha256sum "$CASE"/evidence/* > "$CASE/evidence/SHA256SUMS"
 ```
-
-**Why:** Store source data with collection timestamps and hashes so another analyst can reproduce findings without relying on screenshots alone. `sha256sum` provides a file-integrity reference; it does not authenticate the source server.
 
 **Observed:** The case directory was created as `/root/S04-SOC-20261031-083857/` and initial state was saved.
 
@@ -66,7 +63,7 @@ sha256sum "$CASE"/evidence/* > "$CASE/evidence/SHA256SUMS"
 
 ![B00 - Initial SOC case creation](images/B00-SOC-Case-Creation.png)
 
-### 03. Establish the legitimate-master log timeline
+### 3. Establish the legitimate-master log timeline
 
 **Command:**
 
@@ -89,7 +86,7 @@ journalctl -u prabal-iec104-master.service \
 
 ![B15 - Legitimate telemetry entries in the master journal](images/B15-Normal-Master-Data-Log.png)
 
-### 04. Check defender services and preserve network captures
+### 4. Check defender services and preserve network captures
 
 **Commands:**
 
@@ -101,11 +98,8 @@ systemctl --no-pager is-active \
 CASE="$(cat /root/s04-soc-case-path.txt)"
 mkdir -p "$CASE/pcap"
 cp -n /var/log/prabal-urja/scenario4/pcap/*.pcapng "$CASE/pcap/"
-(cd "$CASE/pcap" && sha256sum *.pcapng > SHA256SUMS)
 ls -lh "$CASE/pcap/"
 ```
-
-**Why:** Confirm the monitored services are running and preserve raw traffic before analysis. The initial empty case folder was corrected by copying all four original `.pcapng` files and generating checksums. If a capture is actively being written, a consistent post-rotation acquisition is preferable.
 
 **Observed:** All four queried services active; four captures preserved. Their names spanned original captures starting 05:35, 06:35, 07:35 and 08:35 UTC.
 
@@ -113,13 +107,11 @@ ls -lh "$CASE/pcap/"
 
 ![B06 - Original IEC-104 PCAP inventory](images/B06-PCAP-Inventory.png)
 
-**Collection troubleshooting:** The first packet query returned no results because the case PCAP directory was empty. The original files were then identified and copied. Retain both screenshots to explain the corrected evidence workflow.
-
 ![B19 - Initial investigation copy missing](images/B19-Missing-PCAP-Initial-Diagnostic.png)
 
 ![B16 - Original packet-capture files identified](images/B16-Original-PCAP-Listing.png)
 
-### 05. Decode APCI transmit and acknowledgement counters
+### 5. Decode APCI transmit and acknowledgement counters
 
 **Command:**
 
@@ -162,7 +154,7 @@ done
 
 ![B08 - APCI jump search returned no matches](images/B08-APCI-Jump-Hunt-No-Matches.png)
 
-### 06. Filter unrelated traffic and identify SCADA TCP resets
+### 6. Filter unrelated traffic and identify SCADA TCP resets
 
 **Command:**
 
@@ -186,7 +178,7 @@ done
 
 ![B20 - Capture service definition and unrelated traffic](images/B20-Capture-Service-And-Unrelated-TCP.png)
 
-### 07. Correlate packet timeline with the service journal
+### 7. Correlate packet timeline with the service journal
 
 **Commands:**
 
@@ -221,7 +213,7 @@ tshark -r "$CASE/pcap/iec104_00003_20261031073545.pcapng" \
 
 ![B11 - Stream 36 and TCP reset at 08:30:28](images/B11-TCP-Stream-36-Correlation.png)
 
-### 08. Identify the exercise trigger and check ongoing interference
+### 8. Identify the exercise trigger and check ongoing interference
 
 **Command (read-only):**
 
@@ -248,7 +240,7 @@ CASE="$(cat /root/s04-soc-case-path.txt)"
 
 ![B21 - Expanded SOC gateway-to-disconnection timeline](images/B21-Full-Gateway-Trigger-Timeline.png)
 
-### 09. Apply lab-specific containment
+### 9. Apply lab-specific containment
 
 **Command (authorised defender action):**
 

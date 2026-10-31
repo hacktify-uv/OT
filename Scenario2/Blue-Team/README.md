@@ -45,30 +45,7 @@ sudo ss -lntp | grep -E ':(502|8090|8091)\b'
 
 **Reason:** Modbus connections can still be healthy during a harmful setpoint manipulation. The CTF dashboard's `DOWN` is a scoring condition, not necessarily an OpenPLC outage.
 
-## 3. Preserve evidence before changing the PLC
-
-The actual Scenario 2 source documents its evidence under `/var/log/prabal-urja-s02/`, not the Scenario 1 log directory. The collection script was run successfully:
-
-```bash
-sudo bash /opt/prabal-urja/scenario2/tools/collect_evidence.sh
-```
-
-**Actual returned archive:**
-
-```text
-/var/tmp/prabal-s02-evidence-20261030T115154Z.tar.gz
-```
-
-![FIGURE 03 - Evidence collector output](images/04-evidence-collection.png)
-
-```bash
-sudo sha256sum /var/tmp/prabal-s02-evidence-20261030T115154Z.tar.gz
-sudo tar -tzf /var/tmp/prabal-s02-evidence-20261030T115154Z.tar.gz | head -n 40
-```
-
-Keep the archive unmodified. Never run a challenge reset or delete rolling PCAPs before completing forensic collection.
-
-## 4. Reconstruct the unauthorised PLC register changes
+## 3. Reconstruct the unauthorised PLC register changes
 
 Read the event records emitted by the running simulator:
 
@@ -93,7 +70,7 @@ The provided screenshot records these transitions:
 
 The observed final changes in the screenshot occurred at approximately **11:34:12 and 11:34:20 UTC** on 30 October 2026. These are simulator log timestamps, not an inferred timeline from the display clock.
 
-## 5. Demonstrate the real simulated process impact
+## 4. Demonstrate the real simulated process impact
 
 ```bash
 sudo tail -n 15 /var/log/prabal-urja-s02/process-historian.csv
@@ -107,7 +84,7 @@ The provided historian rows repeatedly show: setpoint **720 MW**, actual output 
 
 This establishes a working **simulated** electrical-process effect. It does not imply that physical generation equipment was controlled.
 
-## 6. Locate and examine the Modbus packet captures
+## 5. Locate and examine the Modbus packet captures
 
 The PCAPs were present under the source-verified directory:
 
@@ -137,9 +114,9 @@ done
 
 ![FIGURE 08 - Remote Modbus FC06 writes and source IP](images/09-remote-fc06-requests.png)
 
-## 7. Restore the approved 650 MW dispatch
+## 6. Restore the approved 650 MW dispatch
 
-The Blue Team intentionally performed **operational restoration without applying firewall or authorised-master hardening**. The evidence archive had already been collected.
+The Blue Team intentionally performed **operational restoration without applying firewall or authorised-master hardening**. 
 
 The provided recovery screenshot shows a native Modbus function code 03 read followed by a function code 06 write to register `1024` with value 650 MW. On Ubuntu, Netcat accepts `-w` and `-q`, not macOS's `-G` option.
 
@@ -157,7 +134,7 @@ printf '\x00\x0a\x00\x00\x00\x06\x01\x06\x04\x00\x02\x8a' | nc -w 4 -q 1 <ip> 50
 
 Immediately after the write, the API showed `setpoint_mw=650`, `actual_generation_mw=712.17`, transformer **96.84%**, corridor **90.13%**, and `risk_state=1`, while `scenario_state` had already cleared to `NORMAL_DISPATCH`. That is **partial operational recovery**, not the final settled state.
 
-## 8. Verify the final recovered process state
+## 7. Verify the final recovered process state
 
 The operator-console screenshot taken later shows the simulator has settled at the approved operating point:
 
@@ -174,14 +151,3 @@ The operator-console screenshot taken later shows the simulator has settled at t
 | Command sequence | 104 (unchanged in supplied final screenshot) |
 
 ![FIGURE 10 - Operator console after confirmed operational recovery](images/11-restored-operator-console.png)
-
-### Required final scoring verification 
-
-Run the **corrected** Scenario 2 Service Availability TTP through the CTF platform. Confirm that it reports `SERVICE_STATUS:UP` and exit code `0` **after** sustained normal operation. Capture its output for the write-up.
-
-```bash
-# Read-only final process confirmation
-curl -sS http://<ip>:8091/health | jq '{setpoint_mw,actual_generation_mw,transformer_loading_pct,corridor_loading_pct,risk_state,scenario_state}'
-```
-
-**Scoring design caveat:** In the intermediate recovery screenshot the simulator reported `NORMAL_DISPATCH` while generation remained at 712.17 MW and risk was stressed. If the TTP checks only `scenario_state`, it can return `UP` prematurely. For accurate Blue Team scoring, include safe operating thresholds or a sustained healthy-recovery state in the TTP.

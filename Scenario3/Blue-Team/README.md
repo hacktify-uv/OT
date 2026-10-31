@@ -32,36 +32,7 @@ The operator's single-line display independently presented Feeder A at 0 MW, Fee
 
 *Evidence 02. Operator dashboard showing the simulated operational consequence. The displayed loading is an output of the challenge process model.*
 
-## 2. Preserve the incident before remediation
-
-The Blue Team collected evidence while the process was still compromised:
-
-```bash
-sudo /opt/prabal-urja/scenario3/tools/collect_evidence.sh
-```
-
-**Observed response:**
-
-```text
-EVIDENCE_ARCHIVE:/var/tmp/prabal-s03-evidence-20261031T012549Z.tar.gz
-```
-
-![Evidence collection command and generated archive path](images/02-evidence-archive.png)
-
-*Evidence 03. The collector generated the incident archive before containment or restoration.*
-
-The collector in the supplied Scenario 03 package copies Scenario 03 logs and saved state, captures the systemd journal, records socket and firewall information, generates per-file SHA-256 checksums, and compresses the evidence.
-
-Evidence-integrity check:
-
-```bash
-sudo sha256sum /var/tmp/prabal-s03-evidence-20261031T012549Z.tar.gz
-sudo tar -tzf /var/tmp/prabal-s03-evidence-20261031T012549Z.tar.gz | head -30
-```
-
-Avoid resetting or restoring the challenge until the original archive is copied to the case store. Preserve the original file and record the SHA-256 digest in the case notes.
-
-## 3. Reconstruct the switching sequence
+## 2. Reconstruct the switching sequence
 
 The process application log contains two `DNP3_CONTROL_APPLIED` events. These are the strongest direct application-level records of the controls accepted by the simulator.
 
@@ -90,7 +61,7 @@ sudo jq -c '
 
 These are **two distinct control operations**, not merely two protocol acknowledgements. However, `source_ip: "unattributed"` means the process log alone does not identify the original workstation address.
 
-## 4. Confirm the operational impact in the historian
+## 3. Confirm the operational impact in the historian
 
 ```bash
 sudo tail -n 25 /var/log/prabal-urja/scenario3/process-historian.csv
@@ -104,7 +75,7 @@ The historian showed repeated records of the compromised state, with Feeder A at
 
 The confirmed alarms were corridor overload and transformer overload. `load_loss` and `low_bus_voltage` were **false** in the captured state.
 
-## 5. Investigate packet evidence and network origin
+## 4. Investigate packet evidence and network origin
 
 List the retained PCAP files:
 
@@ -147,7 +118,7 @@ The TCP trace showed two connections to the DNP3 maintenance listener:
 
 *Evidence 08. TCP traffic to the maintenance listener coincides with both application control events.
 
-## 6. Verify the legitimate DNP3 master remained healthy
+## 5. Verify the legitimate DNP3 master remained healthy
 
 ```bash
 systemctl is-active prabal-dnp3-master.service
@@ -163,7 +134,7 @@ The service was `active`. The socket listing showed an established local connect
 
 The defensive goal is therefore to restrict the exposed maintenance path while retaining legitimate master communications.
 
-## 7. Examine the web-based engineering disclosure
+## 6. Examine the web-based engineering disclosure
 
 The operator website's root `/robots.txt` was verified to expose this path:
 
@@ -191,7 +162,7 @@ sudo journalctl -u prabal-riverbend-console.service --no-pager |
 
 This site uses a Python HTTP handler rather than Apache.
 
-## 8. Technical finding and root cause
+## 7. Technical finding and root cause
 
 The installed maintenance interface accepted DNP3 controls from an external client using the configured master address `2`, and the process recorded `authorised_source: false`. This permitted an unauthorised workstation to control the simulated breaker outputs. The engineering document made the address and control-point mapping discoverable once the website clue was added.
 
@@ -203,11 +174,11 @@ The two applied controls caused the simulated transfer of load to Feeder B and t
 SERVICE_STATUS:DOWN | REASON:ROGUE_MASTER_ATTACK_CONFIRMED
 ```
 
-## 9. Containment and restoration runbook (recovery procedure)
+## 8. Containment and restoration runbook (recovery procedure)
 
 Coordinate changes with the exercise controller; this is a training simulator.
 
-### 9.1 Contain remote maintenance access
+### 8.1 Contain remote maintenance access
 
 ```bash
 sudo /opt/prabal-urja/scenario3/tools/apply_hardening.sh
@@ -219,7 +190,7 @@ With no authorised maintenance IP provided, the package's `apply_hardening.sh` a
 
 Record the actual nftables table after the change, and test maintenance-port reachability from the authorised exercise client. Neither check has been supplied yet.
 
-### 9.2 Restore the approved topology
+### 8.2 Restore the approved topology
 
 ```bash
 sudo python3 /opt/prabal-urja/scenario3/tools/operator_restore.py   --operator "Blue Team"   --reason "Unauthorised DNP3 switching contained; restore approved River Bend topology"
@@ -232,7 +203,7 @@ curl -fsS http://<ip>:8093/state | jq '{
 
 The packaged restoration helper creates an authorised **process restoration request**. It does not itself perform the two reverse breaker operations via DNP3. This distinction must be made clear in the lab assessment.
 
-### 9.3 Verify operational recovery
+### 8.3 Verify operational recovery
 
 Expected conditions after successful recovery:
 
@@ -248,7 +219,7 @@ Expected conditions after successful recovery:
 | Remote unauthorised maintenance control | Blocked |
 | Deployed CTF availability TTP | `SERVICE_STATUS:UP` |
 
-Check the process and HMI health endpoints, the legitimate-master socket, and rerun the **deployed one-line CTF Service Availability TTP**. The older packaged `service_availability.sh` may evaluate packet-monitor health differently, so do not substitute one checker for the other without examining the exact scoring criteria.
+Check the process and HMI health endpoints and the legitimate-master socket.
 
 ```bash
 curl -fsS http://<ip>:8093/health | jq .

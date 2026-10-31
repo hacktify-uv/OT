@@ -43,29 +43,7 @@ All three services returned `active`. This does **not** mean the telemetry was t
 
 ![Figure 02: all three systemd services active](images/02-running-services.png)
 
-## 4. Preserve evidence before restoring state
-
-```bash
-sudo /opt/prabal-urja/scenario1/tools/collect_evidence.sh /var/tmp/prabal-s01-evidence
-```
-
-The observed output reported:
-
-```text
-EVIDENCE_DIR=/var/tmp/prabal-s01-evidence-20261030T101307Z
-EVIDENCE_ARCHIVE=/var/tmp/prabal-s01-evidence-20261030T101307Z.tar.gz
-```
-
-Verify the archive and preserve it securely:
-
-```bash
-cd /var/tmp
-sudo sha256sum -c prabal-s01-evidence-20261030T101307Z.tar.gz.sha256
-```
-
-![Figure 03: evidence collection output](images/03-evidence-archive.png)
-
-## 5. Reconstruct the actual attack timeline
+## 4. Reconstruct the actual attack timeline
 
 ```bash
 sudo grep -E 'NODE_WRITE_DETECTED|OVERRIDE_ACTIVE|OVERRIDE_CLEARED' /var/log/prabal-urja/opcua-audit.log | tail -n 40
@@ -83,7 +61,7 @@ sudo grep -E 'NODE_WRITE_DETECTED|OVERRIDE_ACTIVE|OVERRIDE_CLEARED' /var/log/pra
 
 ![Figure 04: actual audit entries](images/04-audit-timeline.png)
 
-## 6. Prove actual telemetry is diverging from displayed telemetry
+## 5. Prove actual telemetry is diverging from displayed telemetry
 
 ```bash
 sudo tail -n 12 /var/log/prabal-urja/process-actual.log
@@ -107,7 +85,7 @@ This is the technical result of the exercise. The source implements a **simulate
 
 ![Figure 06: follow-up process samples](images/06-process-continuity.png)
 
-## 7. Investigate network attribution, without guessing
+## 6. Investigate network attribution, without guessing
 
 Inspect current sessions and packet files:
 
@@ -130,9 +108,9 @@ The provided journal excerpt at **09:15:19 UTC** shows a connection from `<ip>` 
 
 ![Figure 09: local session is not attacker attribution](images/09-local-journal-session.png)
 
-## 8. Restore normal operation for the exercise
+## 7. Restore normal operation for the exercise
 
-**First confirm evidence collection is complete.** On an authorised OPC UA client, browse:
+On an authorised OPC UA client, browse:
 
 `Objects → Prabal Urja → HydroPlant → Unit2 → TelemetryGateway`
 
@@ -149,7 +127,7 @@ The server's application code evaluates the override condition continuously. Cle
 
 Do not restart the host or use the exercise reset script merely to clear the incident. Both would interfere with the investigation record or exercise state.
 
-## 9. Confirm recovery and scoring
+## 8. Confirm recovery and scoring
 
 ```bash
 curl -sS http://<ip>:8088/api/state | jq '{channel_state,telemetry_quality,maintenance_mode,freeze_telemetry,alarm_suppression,maintenance_ticket,override_accepted,scenario_state}'
@@ -162,11 +140,3 @@ curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 sleep 8
 curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 ```
-
-Finally rerun the corrected **Service Availability TTP** from the CTF dashboard. Expected after recovery:
-
-```text
-SERVICE_STATUS:UP | REASON:NORMAL_OPERATION | OPCUA_PROBE:PASS | HMI_PROBE:PASS
-```
-
-The expected exit code is `0`.

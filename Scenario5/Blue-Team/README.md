@@ -40,23 +40,7 @@ sudo jq '{asset,active_setting_group,threshold_amps,last_test_current_amps,last_
 
 **Analyst judgement:** This is not merely an alarm-noise condition. Protection has remained inactive under the instructor's fault test.
 
-## 3. Preserve evidence before any containment
-
-**Observed collection command:**
-
-```bash
-sudo bash -c 'd=/root/s05-soc-evidence; mkdir -p "$d"; cp /var/lib/prabal-urja/scenario5/relay-state.json "$d/"; cp /var/log/prabal-urja/scenario5/relay-events.jsonl "$d/"; journalctl -u prabal-s05-mms.service --no-pager > "$d/mms-journal.txt"; cd "$d"; sha256sum * > SHA256SUMS; echo EVIDENCE_COLLECTED'
-```
-
-The local directory holds a snapshot of the relay state, event log, journald export, and hashes to detect accidental modification of those copies. This is an evidence-preservation step; the hash alone does not establish who generated the underlying data.
-
-**Observed:** `EVIDENCE_COLLECTED`.
-
-![Figure B02. Evidence directory and SHA-256 manifest created.](images/blue-02-evidence-collection.png)
-
-**Evidence handling:** record analyst identity, host clock, acquisition time, original file metadata and destination custody, then copy evidence off-host to a restricted case repository.
-
-## 4. Correlate the relay's native event log
+## 3. Correlate the relay's native event log
 
 The scenario writes its security-relevant events to `/var/log/prabal-urja/scenario5/relay-events.jsonl`. Filter the event types that identify the selected group and independent test:
 
@@ -77,17 +61,16 @@ A group-2 setting activation preceded the failed test by **7 minutes 4 seconds**
 
 ![Figure B03. SOC timeline created from native relay event records.](images/blue-03-event-timeline.png)
 
-For preservation-based repeatability, work from the copied file rather than the live append-only source:
-
+Read the relay event log:
 ```bash
-sudo jq -c 'select(.event=="MMS_ACTIVE_SETTING_GROUP_ACCEPTED" or .event=="ACTIVE_GROUP_CURRENT" or .event=="INSTRUCTOR_FAULT_TEST")' /root/s05-soc-evidence/relay-events.jsonl
+sudo jq -c 'select(.event=="MMS_ACTIVE_SETTING_GROUP_ACCEPTED" or .event=="ACTIVE_GROUP_CURRENT" or .event=="INSTRUCTOR_FAULT_TEST")' /var/log/prabal-urja/scenario5/relay-events.jsonl
 ```
 
 **Observed:** four relevant JSON lines: group 1, accepted change to group 2, current group 2, and 1300 A test. The objects contain `epoch`, `event`, `active_group` and `value`; they **do not contain a source IP or engineering username**.
 
 ![Figure B04. Original event objects confirmed in the preserved SOC copy.](images/blue-05-preserved-event-records.png)
 
-## 5. Investigate network visibility and attribution
+## 4. Investigate network visibility and attribution
 
 A packet capture was attempted only after the attacker activity had concluded:
 
@@ -108,7 +91,7 @@ sudo tshark -r /tmp/s05-soc-mms.pcap -Y mms -T fields -e frame.time -e ip.src -e
 
 A late-started empty capture does not prove the attacker used no network connection. **There is insufficient historical network evidence to attribute this attack to a particular Mac IP**. Do not back-fill a guessed source IP into the incident report. Future exercises should run a rolling capture or deploy switch/TAP/SPAN monitoring before Red Team activity.
 
-## 6. Review service logs without inventing telemetry
+## 5. Review service logs without inventing telemetry
 
 The analyst queried journald for the selected incident window:
 
@@ -120,7 +103,7 @@ sudo env TZ=UTC journalctl -u prabal-s05-mms.service --since '2026-10-31 07:30:0
 
 ![Figure B07. No matching journald entries for the incident window.](images/blue-06-journal-no-entries.png)
 
-## 7. Compare with the approved SCL engineering baseline
+## 6. Compare with the approved SCL engineering baseline
 
 The SOC must distinguish a configuration deviation from an authorised temporary commissioning change. The engineering SCL file is used to identify the initial group:
 
@@ -138,7 +121,7 @@ sudo grep -n 'SettingControl' /opt/prabal-urja/scenario5/engineering/PU-DSS-IED-
 
 **Meaning:** the declared initial active group is 1, while the running system was observed in group 2. This supports a configuration-deviation finding. The analyst should request the protection commissioning/change ticket, responsible engineer, authorisation window and corresponding work order. Until these are checked, classify the event as **suspected unauthorised engineering activity**, not conclusively attributable malicious action.
 
-## 8. Incident declaration and containment decision
+## 7. Incident declaration and containment decision
 
 **Proposed SOC case summary based on observed evidence:**
 
@@ -153,15 +136,13 @@ Approval status: unconfirmed, needs change-management review
 Immediate escalation: OT operations / protection engineering / incident commander
 ```
 
-**SOC containment instructions:** Preserve evidence; consult the OT control-room lead; assess whether any critical operational process relies on the simulated IED; determine the current legitimate engineering users; isolate an independently verified rogue engineering workstation *at the network or account boundary* where approved. Do not indiscriminately stop the relay, block all TCP/102, or restart the server as the first response.
+**SOC containment instructions:** Consult the OT control-room lead; assess whether any critical operational process relies on the simulated IED; determine the current legitimate engineering users; isolate an independently verified rogue engineering workstation *at the network or account boundary* where approved. Do not indiscriminately stop the relay, block all TCP/102, or restart the server as the first response.
 
 The lab implementation has no client-identity binding on the setting-group callback, so restoration alone leaves the vulnerability available. Follow-up hardening requires controlled engineering access, explicit approval enforcement in the callback or gateway, trustworthy event fields (source, actor, before/after), and ideally rolling protocol capture.
 
-## 9. Recovery handoff to authorised OT engineering
+## 8. Recovery handoff to authorised OT engineering
 
-
-
-After incident commander approval and evidence preservation, the OT engineer on the Ubuntu scenario host can reset the model with the packaged recovery script:
+After incident commander approval, the OT engineer on the Ubuntu scenario host can reset the model with the packaged recovery script:
 
 ```bash
 sudo /opt/prabal-urja/scenario5/tools/blue_restore.sh
@@ -177,7 +158,7 @@ sudo jq '{active_setting_group,threshold_amps,protection_trip,breaker_closed}' /
 
 Expected after the reset: group `1`, threshold `800`, protection trip `false`, breaker closed `true`.
 
-## 10. Independently verify recovered protection
+## 9. Independently verify recovered protection
 
 **Instructor / authorised OT engineer only:**
 

@@ -294,7 +294,7 @@ SouthboundProtocol   = Modbus/TCP
 
 > **[PENDING IMAGE SLOT P3]** Insert a real Scenario 2 controller discovery / Modbus client screenshot after it has been tested. No IP or command result is supplied here because none has been confirmed.
 
-## 7. Restore and collect evidence
+## 7. Restore normal operation
 
 After documenting the compromise, use the same OPC UA client (or another compatible client) on the **same isolated lab** to reverse the writes. In this order:
 
@@ -306,13 +306,3 @@ After documenting the compromise, use the same OPC UA client (or another compati
 | `MaintenanceTicket` | Empty String |
 
 Refresh `OverrideAccepted` and `Health/ScenarioState`, then refresh the HMI. Expected normal-state values are `OverrideAccepted=false` and `ScenarioState=NORMAL_OPERATION`.
-
-On Ubuntu, preserve original event evidence using the source package's collector:
-
-```bash
-sudo bash /opt/prabal-urja/scenario1/tools/collect_evidence.sh
-```
-
-The collector exports journals, `opcua-audit.log`, `process-actual.log`, available packet captures and checksums to a timestamped archive under `/var/tmp/prabal-s01-evidence-*` by default.
-
-After recovery, rerun the updated scoring TTP. Expect `SERVICE_STATUS:UP` with exit code `0` if the scenario has truly returned to normal and both services pass their protocol checks.

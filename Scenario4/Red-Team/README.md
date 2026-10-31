@@ -28,7 +28,7 @@ IEC 60870-5-104 I-format APDUs carry sequence values `N(S)` (send count) and `N(
 
 ---
 
-### 01. Discover the exposed services
+### 1. Discover the exposed services
 
 **Command (participant terminal):**
 
@@ -57,7 +57,7 @@ route -n get <ip>
 
 ![R14 - Route to the OT lab host over VPN](images/R14-VPN-Route-Check.png)
 
-### 02. Establish a healthy telemetry baseline
+### 2. Establish a healthy telemetry baseline
 
 **Command:**
 
@@ -91,7 +91,7 @@ sudo tcpdump -i utun3 -nn -s 0 'host <ip> and tcp port 2404'
 
 ![R19 - Longer packet output from the participant side](images/R19-TCPDump-Verbose-Packets.png)
 
-### 03. Confirm the participant exercise is ready
+### 3. Confirm the participant exercise is ready
 
 **Command:**
 
@@ -111,7 +111,7 @@ curl -fsS http://<ip>:8095/api/participant/apci/status | python3 -m json.tool
 
 ![R22 - Engineering file unavailable before incident](images/R22-SCL-Unavailable-Before-Incident.png)
 
-### 04. Invoke the fixed, bounded APCI experiment
+### 4. Invoke the fixed, bounded APCI experiment
 
 **Command (once, while the lab is authorised and ready):**
 
@@ -132,7 +132,7 @@ curl -i -X POST \
 
 ![R23 - Earlier accepted experiment request](images/R23-First-HTTP-Exercise-Accepted.png)
 
-### 05. Examine the bounded experiment status
+### 5. Examine the bounded experiment status
 
 **Command:**
 
@@ -152,7 +152,7 @@ curl -fsS http://<ip>:8095/api/participant/apci/status | python3 -m json.tool
 
 ![R25 - Exercise event tail during the test](images/R25-Exercise-Event-Tail.png)
 
-### 06. Verify native SCADA communication impact
+### 6. Verify native SCADA communication impact
 
 **Commands:**
 
@@ -167,7 +167,7 @@ curl -fsS http://<ip>:8095/api/incident | python3 -m json.tool
 
 ![R06 - Incident API reports active telemetry loss](images/R06-Incident-Active.png)
 
-### 07. Confirm impact in the operator HMI
+### 7. Confirm impact in the operator HMI
 
 **Action:** Open `http://<ip>:8095/` in the participant browser while the disruption is active.
 
@@ -177,7 +177,7 @@ curl -fsS http://<ip>:8095/api/incident | python3 -m json.tool
 
 ![R07 - HMI displays IEC-104 telemetry loss](images/R07-HMI-Telemetry-Lost.png)
 
-### 08. Understand CTF scoring and recovery
+### 8. Understand CTF scoring and recovery
 
 The platform's `Service-Availability-TTP.yml` is a **defender-side scoring check**. It was tested separately: while the disruption occurred, it returned `SERVICE_STATUS:DOWN` (exit code 1). Before and after the bounded attack, it returned `UP` (exit code 0). Merely getting HTTP `202` does **not** mean Blue Team points should be deducted. The scoring platform must actually execute and interpret its checker.
 
@@ -193,7 +193,7 @@ curl -fsS http://<ip>:8095/api/state | python3 -m json.tool
 
 ![R26 - Incident information retained after recovery](images/R26-Retained-Incident-Information.png)
 
-### 09. Retrieve the Scenario 05 engineering handoff
+### 9. Retrieve the Scenario 05 engineering handoff
 
 **Command:**
 
