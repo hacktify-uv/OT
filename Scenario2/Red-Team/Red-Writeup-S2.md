@@ -95,13 +95,13 @@ The screenshot confirms `modbus_connected=true`, `setpoint_mw=650`, `actual_gene
 
 The recorded exercise used **Netcat** to send native binary Modbus/TCP frames. This is a real industrial protocol exchange, not a Python script imitating results.
 
-On **macOS** with the built-in `nc`, the successful command was:
+With a Netcat implementation supporting `-G`, the recorded command was:
 
 ```bash
 printf '\x00\x01\x00\x00\x00\x06\x01\x03\x04\x00\x00\x06' | nc -G 3 -w 4 "$TARGET" 502 | hexdump -C
 ```
 
-On **Ubuntu/Linux**, replace the Netcat options with `nc -w 4 -q 1`. The exact `-G` option used above is specific to the macOS implementation and fails on the Ubuntu version used in the lab:
+On **Ubuntu/Linux**, replace the Netcat options with `nc -w 4 -q 1`. The `-G` option used above is unavailable in the Ubuntu version used in the lab:
 
 ```bash
 printf '\x00\x01\x00\x00\x00\x06\x01\x03\x04\x00\x00\x06' | nc -w 4 -q 1 "$TARGET" 502 | hexdump -C
@@ -134,7 +134,7 @@ The actual response was:
 
 The exercise used **Modbus Function Code `06` (Write Single Register)**. It first changed the setpoint by only 5 MW, then advanced the command sequence. Both are within the test simulator's authorised engineering bounds.
 
-On macOS, with `TARGET` set as above:
+With `TARGET` set as above and Netcat supporting `-G`:
 
 ```bash
 # Set governor register 1024 to 655 (0x028f)

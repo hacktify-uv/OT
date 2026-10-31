@@ -23,12 +23,12 @@ export TARGET
 
 **Exercise:** Unit-2 operations console and OPC UA telemetry gateway  
 **Target in this run:** `<ip>`  
-**Red Team workstation:** Any network-connected system with a compatible OPC UA client (Windows, Linux or macOS). The screenshots show Prosys OPC UA Browser as one tested example.  
+**Red Team workstation:** Any network-connected system with a compatible OPC UA client. The screenshots show Prosys OPC UA Browser as one tested example.  
 **Observed date:** 30 October 2026  
 **Server:** Native open62541 OPC UA application; HMI polls the OPC UA namespace  
 **Scope:** Authorised, isolated OT cyber range only
 
-> **Platform-neutral instructions.** This challenge does not require a MacBook or a specific operating system. Use any Windows, Linux, macOS or other workstation that can reach the isolated lab and run a suitable OPC UA client. The screenshots show one Prosys client session, not an installation requirement. Menu labels may differ, but the OPC UA node operations and server responses are what matter.
+> **Platform-neutral instructions.** Use any workstation that can reach the isolated lab and run a suitable OPC UA client. The screenshots show one Prosys client session, not an installation requirement. Menu labels may differ, but the OPC UA node operations and server responses are what matter.
 
 ## 1. Objective and observed result
 
@@ -231,7 +231,7 @@ After all four maintenance inputs were set, the live HMI displayed:
 
 ### 5.1 Read the live HMI state API
 
-From a Bash-compatible terminal with `curl` and `jq` installed (Linux, macOS, WSL, or the exercise Ubuntu VM):
+From a Bash-compatible terminal with `curl` and `jq` installed (Linux, WSL, or the exercise Ubuntu VM):
 
 ```bash
 curl -sS http://${TARGET}:8088/api/state | jq '{connected,channel_state,telemetry_quality,override_accepted,maintenance_ticket,freeze_telemetry,alarm_suppression,scenario_state,downstream_controller,southbound_protocol}'

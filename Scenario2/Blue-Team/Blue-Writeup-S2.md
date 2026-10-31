@@ -131,7 +131,7 @@ done
 
 The Blue Team intentionally performed **operational restoration without applying firewall or authorised-master hardening**. 
 
-The provided recovery screenshot shows a native Modbus function code 03 read followed by a function code 06 write to register `1024` with value 650 MW. On Ubuntu, Netcat accepts `-w` and `-q`, not macOS's `-G` option.
+The provided recovery screenshot shows a native Modbus function code 03 read followed by a function code 06 write to register `1024` with value 650 MW. On Ubuntu, use Netcat options `-w` and `-q`.
 
 ```bash
 # Read register state before a recovery write

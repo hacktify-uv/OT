@@ -24,7 +24,7 @@ export TARGET
 
 **Exercise date:** 31 October 2026  
 **Module:** Red-vs-Blue, isolated OT training range  
-**Participant platform:** macOS over the authorised training VPN (commands are also usable from another workstation with `curl` and Nmap)  
+**Participant platform:** Workstation with `curl` and Nmap over the authorised training VPN  
 **Objective:** Demonstrate telemetry loss in the native IEC 60870-5-104 master/outstation link, verify the operational impact, and extract the Scenario 05 engineering handoff.
 
 ### Exercise scope and architecture
@@ -41,7 +41,7 @@ export TARGET
 | Internal experiment path | `pu-s04-transit` | Isolated NFQUEUE modification point |
 | Experiment duration | 95 seconds | Bounded, restores normal forwarding at completion |
 
-The Mac interacts with the **lab gateway** over HTTP `8095`. The privileged helper applies a fixed, bounded experiment within the **existing** legitimate master/outstation flow. A separate TCP connection from the Mac to port `2404` is not on-path and would not, by itself, change the master's APCI counters.
+The Red Team workstation interacts with the **lab gateway** over HTTP `8095`. The privileged helper applies a fixed, bounded experiment within the **existing** legitimate master/outstation flow. A separate TCP connection from the Red Team workstation to port `2404` is not on-path and would not, by itself, change the master's APCI counters.
 
 ### What APCI sequence integrity means
 
@@ -98,13 +98,13 @@ curl -fsS http://${TARGET}:8095/api/state | python3 -m json.tool
 
 ![R15 - Terminal telemetry state comparison](images/R15-Telemetry-Before-After-Check.png)
 
-**Passive packet observation from the Mac (supporting reconnaissance, not the exploit):** The participant used `tcpdump` on the VPN interface to observe packets associated with the exposed IEC-104 endpoint. This proves traffic visibility on the participant's own connection; it does **not** establish access to the master/outstation internal traffic path.
+**Passive packet observation from the Red Team workstation (supporting reconnaissance, not the exploit):** The participant used `tcpdump` on the VPN interface to observe packets associated with the exposed IEC-104 endpoint. This proves traffic visibility on the participant's own connection; it does **not** establish access to the master/outstation internal traffic path.
 
 ```bash
 sudo tcpdump -i utun3 -nn -s 0 "host ${TARGET} and tcp port 2404"
 ```
 
-![R16 - Mac VPN capture setup](images/R16-VPN-TCPDump-Capture.png)
+![R16 - VPN capture setup](images/R16-VPN-TCPDump-Capture.png)
 
 ![R17 - Live packet count from VPN capture](images/R17-Mac-TCPDump-Packets.png)
 
