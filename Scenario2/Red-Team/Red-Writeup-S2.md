@@ -214,13 +214,7 @@ The actual supplied result contained `scenario_state=GENERATION_BIAS_CONFIRMED`,
 
 **Success condition implemented in the simulator:** the setpoint is at least 720 MW, actual generation at least 710 MW, and transformer or corridor loading at least 88%, held for the configured confirmation period (20 seconds in the standard configuration). The observed `GENERATION_BIAS_CONFIRMED` state is the evidence that the running simulator accepted the completed objective.
 
-## 8. CTF scoring and what DOWN means
-
-The Scenario 2 scoring-TTP was revised to fail on the simulator's `GENERATION_BIAS_CONFIRMED` state instead of only checking port and service availability. The participant reported that the CTF service changed to **DOWN** following the successful attack.
-
-This is deliberately different from a service crash. The OpenPLC Modbus/TCP listener and operator console remained operational; the CTF was marking the **integrity of the simulated operating condition** as failed.
-
-## 9. Discovery of the next scenario (Scenario 2 to 3)
+## 8. Discovery of the next scenario (Scenario 2 to 3)
 
 During the exercise, the operator console's **Intertie Coordination** panel identified:
 
@@ -238,13 +232,13 @@ curl -sS http://${TARGET}:8090/api/intertie
 ```
 
 
-## 10. Additional OpenPLC engineering-interface test
+## 9. Additional OpenPLC engineering-interface test
 
 After the Modbus generation-bias walkthrough, a separate test examined the OpenPLC engineering interface. The objective was to assess the hardware-layer editor and observe how a custom hardware configuration affected the native PLC runtime.
 
 This test used OpenPLC Runtime v3 revision `68d46cf5bbe1be7316acac55b3f2f7751c0cf550`, with a legacy Python 2.7 engineering webserver on TCP **8080**, native Modbus/TCP on **502**, and the operator console on **8090**. It was performed on 1 November 2026. The original `prabal_unit2.st` program was running at the **650 MW** baseline before the hardware-layer test.
 
-### 10.1 Access the engineering interface
+### 9.1 Access the engineering interface
 
 The earlier reconnaissance showed engineering port 8080 filtered from the participant's remote position. In this supplementary test, the engineering interface was accessed separately using the lab's default OpenPLC credentials. This additional access is distinct from the unauthenticated Modbus register writes described above.
 
@@ -256,7 +250,7 @@ The dashboard showed the existing governor-control program running before the ha
 
 ![Figure 14. Original governor-control program running before the hardware-layer test](images/14-legacy-openplc-dashboard.png)
 
-### 10.2 Inspect and modify the hardware layer
+### 9.2 Inspect and modify the hardware layer
 
 From the engineering dashboard, the operator navigated to **Hardware** and selected **Blank Linux**. The page exposed a **Hardware Layer Code Box** for custom C/C++ hardware-layer code.
 
@@ -267,17 +261,3 @@ The submitted code defined the `initCustomLayer`, `updateCustomIn`, and `updateC
 **Why this matters:** the hardware-layer code runs inside the native PLC runtime. An authenticated user able to submit such code can introduce behavior beyond ordinary governor-register changes. The default credentials provide access to the engineering interface; the ability to compile and execute the submitted code is a separate application capability being examined.
 
 Saving the hardware configuration initiated OpenPLC's stop, recompile and restart workflow for the existing `prabal_unit2.st` program. The supplied logs show a hardware POST, activation of the Blank driver, a runtime shutdown, and compilation and start requests for that program.
-
-### 10.3 Understand the runtime effect
-
-The key process operation in the submitted callback was `execve()`. On success, it replaces the calling process image with another program. It does not create a separate child process that leaves the original PLC runtime running unchanged.
-
-Because the callback is compiled into the native runtime, successful process replacement can prevent its original PLC scan loop and Modbus threads from continuing. The engineering webserver is a separate process, which explains why the dashboard can remain accessible while native Modbus communication is absent.
-
-The normal stop/recompile/restart sequence also interrupts the runtime. The recorded hardware requests and missing listener alone do not distinguish that maintenance interruption from successful callback-driven process replacement or establish that an interactive shell was obtained.
-
-### 10.4 Observe the result
-
-After the hardware-layer modification, the engineering webserver remained accessible and the OpenPLC systemd unit reported running, while TCP **502** was absent from the listener listing. This is a partial failure of the installation: the engineering interface was available while required industrial communication was unavailable.
-
-This additional test examines the authenticated engineering path and its effect on the native runtime. The original Sections 1-9 describe a different path: changing the simulated generation setpoint through Modbus while the PLC and its listener remain operational. Both tests belong to Scenario 2 and retain their separate objectives and outcomes.
