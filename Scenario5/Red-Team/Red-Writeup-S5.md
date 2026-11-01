@@ -4,7 +4,7 @@
 
 ## Starting information
 
-Scenario 4 supplies the substation SCL engineering file identifying `PU-DSS-IED-01` and its protection model. Continue with the relay setting-group investigation.
+The dispatch engineering file identifies protection IED PU-DSS-IED-01 and its IEC 61850 model. The investigation moves to its MMS engineering interface to examine whether changing the active setting group weakens protection.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
@@ -15,9 +15,6 @@ printf "Assigned scenario address: "
 read -r TARGET
 export TARGET
 ```
-
-**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
-
 
 **Challenge:** Native IEC 61850 protection setting-group manipulation  
 **Exercise type:** Authorised OT cyber-range, simulated digital substation  
@@ -58,15 +55,15 @@ Native libIEC61850 IED server -> protection-state model
     +-> Instructor-only current injection on Ubuntu
 ```
 
-The exercise started from the Red Team workstation, not from an interactive shell on the Ubuntu IED. The Ubuntu machine was used by an instructor to deploy the range, run the independent fault fixture and evaluate the service-availability TTP. No SSH session or server-side file edit was used for the Red Team setting-group write.
+The exercise started from the Red Team workstation, not from an interactive shell on the Ubuntu IED. The Ubuntu machine was used by an instructor to deploy the range, run the independent fault fixture and observe the resulting protection response. No SSH session or server-side file edit was used for the Red Team setting-group write.
 
-**Tool provenance:** The participant installed the prebuilt `iec61850ctl` v0.6.0 binary matching the client operating system and architecture from the upstream releases at <https://github.com/otfabric/iec61850ctl/releases>. The downloaded archive passed SHA-256 verification, and `iec61850ctl version` printed `0.6.0`. Installation of Qt/QTester104 was unnecessary for this scenario.
+**Prepare the engineering client:** The participant installed the prebuilt `iec61850ctl` v0.6.0 binary matching the client operating system and architecture from the upstream releases at <https://github.com/otfabric/iec61850ctl/releases>. The downloaded archive passed SHA-256 verification, and `iec61850ctl version` printed `0.6.0`. Installation of Qt/QTester104 was unnecessary for this scenario.
 
 **On other operating systems:** Select an asset matching the operating system and CPU architecture from the upstream release listing, verify its supplied checksum, and execute the tool locally. Do not rename an ARM64 binary as AMD64 or assume the same shell syntax across platforms.
 
 ## 3. Reconnaissance: identify the service
 
-**Required first reconnaissance step for the final participant write-up. Not present in the original screenshot set:** from the Red Team workstation, run a narrow authorised Nmap service scan against the allocated scenario host.
+The investigation starts with a narrow service scan from the Red Team workstation to identify the allocated IED interface and operator view.
 
 ```bash
 nmap -Pn -sT -p 102,8098 --reason "${TARGET}"
@@ -158,7 +155,6 @@ iec61850ctl get object --host ${TARGET} --port 102 --object 'PU-DSS-IED-01LD0/PT
 
 ```bash
 sudo bash /opt/prabal-urja/scenario5/tools/instructor_fault_test.sh 1300
-sudo python3 /opt/prabal-urja/scenario5/tools/service_availability.py
 ```
 
 The fixture writes a bounded test current to a root-controlled local file, and the native simulated IED evaluates it against the **currently selected** setting group. This is an independent process test, not an attacker HTTP endpoint.
@@ -178,26 +174,6 @@ The fixture writes a bounded test current to a root-controlled local file, and t
 }
 ```
 
-```text
-SERVICE_STATUS:DOWN | REASON:PROTECTION_RESPONSE_SUPPRESSED
-```
-
-![Figure R08. Independent 1300 A fault did not trip the simulated relay; TTP reported DOWN.](images/red-07-fault-test-and-down-ttp.png)
+![Figure R08. Independent 1300 A fault did not trip the simulated relay; the breaker remained closed.](images/red-07-fault-test-and-down-ttp.png)
 
 **Technical interpretation:** The same 1300 A test is greater than the group-1 800 A threshold but below the group-2 1600 A threshold. Therefore, the model did not trip and the breaker stayed closed. The test demonstrates a protection blind spot **inside this simulator**. It does not claim a physical current was injected, a vendor relay was exploited, or the grid was islanded.
-
-## 8. TTP scoring and what qualifies as success
-
-The original distributed TTP evaluated the native MMS read together with the independently recorded fault outcome. During testing, the local TTP command was later replaced with an inline shell expression using the installed MMS client and `jq`. **That modified local TTP is not contained in the original ZIP**. Keep the deployed TTP and this write-up together when publishing the final range.
-
-| Evidence tier | Observed result | Interpretation |
-|---|---|---|
-| Reachability | TCP/102 open | Network route exists |
-| MMS discovery | Logical device/nodes enumerated | Native industrial protocol worked |
-| Write result | `write_ok: true` | Group-selection command accepted |
-| MMS readback | `ActSG = 2`; threshold `1600` | Changed configuration confirmed |
-| Independent test | 1300 A, no trip | Simulated protection impact confirmed |
-| Final scorer | `SERVICE_STATUS:DOWN` | Lab's attack-impact condition satisfied |
-
-Likewise, a `DOWN` result caused only by an MMS process outage is not proof of setting-group manipulation.
-

@@ -4,14 +4,11 @@
 
 ## Starting information
 
-Scenario 1 exposes the governor controller identifier `PU-GOV-PLC-02` and its Modbus/TCP protocol. Continue by examining that controller in this assigned scenario.
+Unit-2 generation has risen above its approved operating point. The investigation follows the governor registers, process events and loading history to reconstruct the changes and restore the normal dispatch setting.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
 Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
-
-**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
-
 
 **Scenario:** Silent Generation Bias  
 **System:** `PU-GOV-PLC-02`, OpenPLC with native Modbus/TCP and pandapower process simulation  
@@ -26,7 +23,7 @@ During the Red Team exercise, a remote Modbus/TCP client used function code `06`
 
 ![FIGURE 01 - Compromised operator console](images/01-compromised-operator-console.png)
 
-**Initial assessment:** The industrial service had not necessarily crashed. The CTF availability check was configured to fail when the simulator confirmed a harmful operating state. Distinguish protocol-service availability from safe process operation when triaging this incident.
+**Initial assessment:** The controller was still responding while the simulated generation and loading were abnormal. The investigation therefore followed the operating state and command history rather than treating the incident as a controller shutdown.
 
 | Metric | Approved baseline | Compromised state | Verified recovered state |
 |---|---:|---:|---:|
@@ -56,7 +53,7 @@ sudo systemctl is-active prabal-openplc.service prabal-grid-simulator.service pr
 sudo ss -lntp | grep -E ':(502|8090|8091)\b'
 ```
 
-**Reason:** Modbus connections can still be healthy during a harmful setpoint manipulation. The CTF dashboard's `DOWN` is a scoring condition, not necessarily an OpenPLC outage.
+**Reason:** Modbus communication can remain healthy while an unauthorised setpoint changes generation. The process measurements and historian show how that change affected the operating point.
 
 ## 3. Reconstruct the unauthorised PLC register changes
 
@@ -164,4 +161,3 @@ The operator-console screenshot taken later shows the simulator has settled at t
 | Command sequence | 104 (unchanged in supplied final screenshot) |
 
 ![FIGURE 10 - Operator console after confirmed operational recovery](images/11-restored-operator-console.png)
-

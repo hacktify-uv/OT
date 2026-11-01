@@ -4,14 +4,11 @@
 
 ## Starting information
 
-Scenario 2 identifies River Bend as the downstream switching dependency during corridor stress. Investigate its RTU and engineering point map.
+River Bend reports an unexpected breaker arrangement and excessive load on Feeder B. The investigation starts with the switching state, then traces the applied DNP3 controls while checking the legitimate master connection.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
 Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
-
-**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
-
 
 ## Blue Team Investigation and Recovery Runbook
 
@@ -21,7 +18,7 @@ Run host commands on the assigned defender VM. Replace `<ip>` in each command wi
 
 The River Bend RTU accepted two switching controls over its maintenance DNP3 channel. The first closed the bus tie. The second opened Feeder A. The resulting simulated configuration routed the combined 620 MW feeder load onto Feeder B. The process marked the scenario `ROGUE_MASTER_SWITCHING_CONFIRMED`, with transformer loading of **101.4%** and corridor loading of **96.8%**.
 
-The CTF's deployed availability check previously returned `SERVICE_STATUS:DOWN | REASON:ROGUE_MASTER_ATTACK_CONFIRMED`. This represents a **process integrity failure**, not a loss of DNP3 service. At the time of Blue Team investigation, the legitimate DNP3 master remained active and polling.
+At the start of the investigation, the legitimate DNP3 master remained active and polling while the breaker configuration directed the combined load onto Feeder B.
 
 | Observation | Verified value |
 |---|---|
@@ -181,11 +178,7 @@ The installed maintenance interface accepted DNP3 controls from an external clie
 
 The case establishes a **challenge-specific maintenance-channel access-control failure**. It does not show that DNP3 devices in general accept commands from any network host or that the legitimate master was compromised.
 
-The two applied controls caused the simulated transfer of load to Feeder B and triggered transformer and corridor overload conditions. CTF scoring previously confirmed:
-
-```text
-SERVICE_STATUS:DOWN | REASON:ROGUE_MASTER_ATTACK_CONFIRMED
-```
+The two applied controls transferred the simulated load to Feeder B and triggered transformer and corridor overload conditions. The investigation then moved from reconstructing the event to restricting the maintenance path and restoring the normal topology.
 
 ## 8. Containment and restoration runbook (recovery procedure)
 
@@ -230,7 +223,6 @@ Expected conditions after successful recovery:
 | Scenario confirmed | `false` |
 | Legitimate DNP3 master | Active, connected and polling |
 | Remote unauthorised maintenance control | Blocked |
-| Deployed CTF availability TTP | `SERVICE_STATUS:UP` |
 
 Check the process and HMI health endpoints and the legitimate-master socket.
 
@@ -239,4 +231,3 @@ curl -fsS http://<ip>:8093/health | jq .
 curl -fsS http://<ip>:8092/api/health | jq .
 systemctl is-active prabal-dnp3-outstation.service   prabal-dnp3-master.service   prabal-riverbend-process.service   prabal-riverbend-console.service
 ```
-

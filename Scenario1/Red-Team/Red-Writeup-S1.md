@@ -4,7 +4,7 @@
 
 ## Starting information
 
-This is the starting point: investigate the Unit-2 telemetry gateway and its maintenance controls.
+The investigation begins at the Unit-2 telemetry gateway, where maintenance controls govern the readings and alarms presented to the operator. The first task is to understand the normal display and examine the OPC UA maintenance pathway.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
@@ -15,9 +15,6 @@ printf "Assigned scenario address: "
 read -r TARGET
 export TARGET
 ```
-
-**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
-
 
 **Prabal Urja Hydroelectric Power Station | Red Team practical write-up**
 
@@ -34,7 +31,7 @@ export TARGET
 
 The Red Team objective was to determine whether an anonymous OPC UA client could misuse the Unit-2 maintenance pathway to hold the operator's displayed telemetry and inhibit alarms without shutting down the service.
 
-**Observed outcome:** the operator HMI changed from `NORMAL_OPERATION` to `UNAUTHORISED_MAINTENANCE_OVERRIDE`. The HMI displayed `MAINTENANCE_HOLD`, `UNCERTAIN_LAST_USABLE_VALUE`, `Override: ACCEPTED`, `Alarm Suppression: YES` and `Freeze Request: YES`. The dashboard-scoring check then returned `SERVICE_STATUS:DOWN` with exit code `1` while real protocol and web services remained available.
+**Observed outcome:** the operator HMI changed from `NORMAL_OPERATION` to `UNAUTHORISED_MAINTENANCE_OVERRIDE`. The HMI displayed `MAINTENANCE_HOLD`, `UNCERTAIN_LAST_USABLE_VALUE`, `Override: ACCEPTED`, `Alarm Suppression: YES` and `Freeze Request: YES`. The operator display held its values while the protocol and web services continued running.
 
 | Evidence item | What the exercise actually demonstrated |
 | --- | --- |
@@ -44,7 +41,6 @@ The Red Team objective was to determine whether an anonymous OPC UA client could
 | Unauthorised write | `MaintenanceTicket` successfully changed and read back from the server |
 | Maintenance controls | `MaintenanceMode`, `FreezeTelemetry` and `AlarmSuppression` set to `true`; final HMI confirms all three |
 | Operational application effect | Accepted override, maintenance hold, reduced data quality, alarms inhibited in the simulated HMI |
-| CTF score condition | `SERVICE_STATUS:DOWN`, `TTP_EXIT_CODE=1` observed in the Ubuntu scoring test |
 | Scenario 2 clue | `PU-GOV-PLC-02` and `Modbus/TCP` exposed |
 
 ## 2. Reconnaissance and baseline
@@ -263,18 +259,7 @@ This is an excerpt of fields from the observed response, not an additional scree
 Invoke-RestMethod -Uri "http://<ip>:8088/api/state" | Select-Object connected, channel_state, telemetry_quality, override_accepted, scenario_state
 ```
 
-### 5.2 Distinguish service health from a scored operational failure
-
-During the attack, the **original** health-only TTP returned `SERVICE_STATUS:UP` because systemd, ports and functional OPC UA/HMI probes were healthy. The updated **scoring** check examines the actual scenario state and returned:
-
-```text
-SERVICE_STATUS:DOWN | REASON:ATTACK_DETECTED_OPCUA
-TTP_EXIT_CODE=1
-```
-
-**Why:** in this range, `DOWN` is a Blue Team scoring failure because telemetry integrity has been compromised. It does **not** mean the OPC UA service or port 4840 crashed. Actual scoreboard point deductions still depend on dashboard integration and policy.
-
-### 5.3 Independent process versus displayed telemetry: test still required
+### 5.2 Compare actual process and displayed telemetry
 
 The server source includes an independent simulated-process logger. To establish manipulation-of-view beyond the accepted override state, compare the process log and repeated displayed values while the hold is active:
 
@@ -298,10 +283,6 @@ done
 
 **Pass criterion:** during `override=true`, `actual_power_mw` changes in `/var/log/prabal-urja/process-actual.log` while `displayed_power_mw` and the HMI's active-power reading remain constant.
 
-> **[PENDING IMAGE SLOT P1]** Insert a real Ubuntu terminal screenshot showing two `PROCESS_SAMPLE` records with changing `actual_power_mw` and unchanged `displayed_power_mw`. Do not create a synthetic screenshot.
-
-> **[PENDING IMAGE SLOT P2]** Insert repeated real `/api/state` results showing constant displayed power during the same time interval.
-
 ## 6. Scenario 1 to Scenario 2 discovery
 
 The genuine information visible through the OPC UA engineering metadata and final HMI is:
@@ -310,8 +291,6 @@ The genuine information visible through the OPC UA engineering metadata and fina
 DownstreamController = PU-GOV-PLC-02
 SouthboundProtocol   = Modbus/TCP
 ```
-
-> **[PENDING IMAGE SLOT P3]** Insert a real Scenario 2 controller discovery / Modbus client screenshot after it has been tested. No IP or command result is supplied here because none has been confirmed.
 
 ## 7. Restore normal operation
 
@@ -325,4 +304,3 @@ After documenting the compromise, use the same OPC UA client (or another compati
 | `MaintenanceTicket` | Empty String |
 
 Refresh `OverrideAccepted` and `Health/ScenarioState`, then refresh the HMI. Expected normal-state values are `OverrideAccepted=false` and `ScenarioState=NORMAL_OPERATION`.
-

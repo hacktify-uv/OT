@@ -4,7 +4,7 @@
 
 ## Starting information
 
-Scenario 3 identifies the dispatch control authority and IEC-104 telecontrol relationship. Investigate the legitimate master/outstation communication in this scenario.
+River Bend's Control Authority register identifies the Northern Load Dispatch Centre and its IEC-104 telecontrol relationship. The investigation follows the dispatch link to examine how disrupted communication affects fresh operator telemetry.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
@@ -17,8 +17,6 @@ printf "Assigned scenario address: "
 read -r TARGET
 export TARGET
 ```
-
-**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
 
 ## Red Team Walkthrough: IEC-104 Session Integrity
 
@@ -198,9 +196,9 @@ curl -fsS http://${TARGET}:8095/api/incident | python3 -m json.tool
 
 ![R07 - HMI displays IEC-104 telemetry loss](images/R07-HMI-Telemetry-Lost.png)
 
-### 8. Understand CTF scoring and recovery
+### 8. Follow the return of dispatch telemetry
 
-The platform's `Service-Availability-TTP.yml` is a **defender-side scoring check**. It was tested separately: while the disruption occurred, it returned `SERVICE_STATUS:DOWN` (exit code 1). Before and after the bounded attack, it returned `UP` (exit code 0). Merely getting HTTP `202` does **not** mean Blue Team points should be deducted. The scoring platform must actually execute and interpret its checker.
+As the bounded experiment ends, follow the master connection and telemetry age to see when fresh dispatch information returns.
 
 **Read-only recovery check:**
 
@@ -245,4 +243,3 @@ grep -nE 'IED|AccessPoint|PTOC|PTRC|XCBR|MMXU|RREC|Communication|ConnectedAP' PU
 The logical-node search provides a compact visual hint for Scenario 05 without asserting that the file supplies an IP address or credentials.
 
 ![R28 - SCL IED and logical node identification](images/R28-SCL-Logical-Node-Grep.png)
-

@@ -4,14 +4,11 @@
 
 ## Starting information
 
-Scenario 4 supplies the substation SCL engineering file identifying `PU-DSS-IED-01` and its protection model. Continue with the relay setting-group investigation.
+The protection IED did not trip during a simulated overcurrent test. The investigation follows the active setting group, native relay events and engineering baseline before restoring the approved protection configuration.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
 Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
-
-**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
-
 
 **Case type:** Suspected unauthorised protection-setting modification  
 **Affected asset:** `PU-DSS-IED-01`, IEC 61850 MMS relay simulator  
@@ -181,13 +178,4 @@ sudo /opt/prabal-urja/scenario5/tools/instructor_fault_test.sh 1300
 
 At group 1's 800 A pickup, the 1300 A simulated fault should cause `last_test_trip: true`, `protection_trip: true` and `breaker_closed: false`. This tripped state is the **correct protective response**, even though normal operations would later require a controlled reset.
 
-**Check native service availability using the deployed challenge TTP.** The user's local TTP has been changed from the original archive to an inline shell check. Run it through the CTF platform; do not silently substitute the older ZIP version. The expected result after a successful group-1 test is:
-
-```text
-SERVICE_STATUS:UP | REASON:PROTECTION_ACTIVE
-```
-
-**Scoring caveat:** The inline TTP can return `UP` solely because the previous group-2 suppression predicate is no longer true. Therefore, the SOC must preserve the actual successful-trip record separately; `UP` by itself is not proof of recovered protection. Once captured and approved, the operator can clear the latched trip by returning the simulator to its normal state using the approved reset method.
-
->
-
+After the protection test, the authorised operator can use the approved reset procedure to return the simulator to its normal operating state.

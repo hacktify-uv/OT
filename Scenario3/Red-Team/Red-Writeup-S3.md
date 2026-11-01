@@ -4,7 +4,7 @@
 
 ## Starting information
 
-Scenario 2 identifies River Bend as the downstream switching dependency during corridor stress. Investigate its RTU and engineering point map.
+The intertie information points to River Bend RTU PU-RB-RTU-07, whose feeder and bus-tie switching affects the stressed corridor. The investigation continues through its operator view and DNP3 maintenance interface.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
@@ -15,9 +15,6 @@ printf "Assigned scenario address: "
 read -r TARGET
 export TARGET
 ```
-
-**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
-
 
 ## Red Team Walkthrough
 
@@ -318,19 +315,7 @@ The expected post-attack input pattern is `0 = OFF`, `1 = ON`, `2 = ON`. **This 
 
 *Figure 09. Dashboard measurements and active corridor/transformer conditions.*
 
-## 9. Confirm the CTF objective
-
-The platform's Service Availability check evaluates the process state, not merely whether the DNP3 service or website remains reachable. The confirmed attack caused the check to return:
-
-```text
-SERVICE_STATUS:DOWN | REASON:ROGUE_MASTER_ATTACK_CONFIRMED
-```
-
-This was observed after the two applied controls. The `DOWN` result means that **process integrity is compromised**; it does not mean the DNP3 TCP listener or HMI has necessarily stopped running.
-
-The availability check is run by the **CTF platform**, not by the Red Team participant. No server-side validator, private API or local challenge script is needed to perform the attack.
-
-## 10. Follow the control-authority evidence
+## 9. Follow the control-authority evidence
 
 Once the switching incident was confirmed, the operator website displayed a verified **Control Authority** engineering register. The observed register contained:
 
@@ -346,4 +331,3 @@ The page described the ownership record as verified against a live master heartb
 ![Figure 10. Verified Control Authority record identifying the dispatch centre and related telecontrol standard.](images/10-control-authority-register.png)
 
 *Figure 10. Verified Control Authority record identifying the dispatch centre and related telecontrol standard.*
-

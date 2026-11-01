@@ -4,7 +4,7 @@
 
 ## Starting information
 
-Scenario 1 exposes the governor controller identifier `PU-GOV-PLC-02` and its Modbus/TCP protocol. Continue by examining that controller in this assigned scenario.
+The gateway metadata identifies PU-GOV-PLC-02 as the downstream governor controller and Modbus/TCP as its control protocol. The investigation follows that asset to examine how its generation setpoint affects Unit-2 loading.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
@@ -15,9 +15,6 @@ printf "Assigned scenario address: "
 read -r TARGET
 export TARGET
 ```
-
-**Walkthrough:** Objective → discovery → protocol actions → operational impact → next scenario.
-
 
 **Challenge:** Silent Generation Bias  
 **Target controller:** `PU-GOV-PLC-02`  
@@ -230,7 +227,6 @@ The source also defines a read-only endpoint:
 ```bash
 curl -sS http://${TARGET}:8090/api/intertie
 ```
-
 
 ## 9. Investigate the OpenPLC engineering interface
 

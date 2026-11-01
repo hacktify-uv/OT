@@ -4,20 +4,17 @@
 
 ## Starting information
 
-This is the starting point: investigate the Unit-2 telemetry gateway and its maintenance controls.
+The operator reports that Unit-2 readings have stopped changing while maintenance controls are active. The investigation begins by comparing the displayed state with the gateway variables and actual process samples.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
 Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
 
-**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
-
-
 **Challenge:** The Trusted Maintenance Window  
 **Evidence date:** 30 October 2026  
 **Affected asset:** `PU-OPCUA-GW-01`, Unit 2  
 **Exercise server:** `<ip>`  
-**Scope:** Investigate the demonstrated OPC UA telemetry-integrity incident, preserve the evidence, restore the normal application state and validate the CTF scoring check. This procedure does not alter the challenge's persistent access configuration.
+**Scope:** Investigate the demonstrated OPC UA telemetry-integrity incident, preserve the evidence, restore the normal application state and confirm that live telemetry resumes. This procedure does not alter the challenge's persistent access configuration.
 
 ## 1. Incident summary
 
@@ -52,7 +49,7 @@ The captured response showed:
 sudo systemctl is-active prabal-opcua.service prabal-hmi.service prabal-opcua-capture.service
 ```
 
-All three services returned `active`. This does **not** mean the telemetry was trustworthy: the CTF's corrected Service Availability TTP treats a verified telemetry-integrity compromise as a scoring failure and returns `SERVICE_STATUS:DOWN` with exit code `1` while the services may still run normally.
+All three services returned `active`, so the investigation turned to the integrity of the values being displayed. The next step was to reconstruct the maintenance-variable changes and compare actual process samples with the held operator readings.
 
 ![Figure 02: all three systemd services active](images/02-running-services.png)
 
@@ -140,7 +137,7 @@ The server's application code evaluates the override condition continuously. Cle
 
 Do not restart the host or use the exercise reset script merely to clear the incident. Both would interfere with the investigation record or exercise state.
 
-## 8. Confirm recovery and scoring
+## 8. Confirm that live telemetry resumes
 
 ```bash
 curl -sS http://<ip>:8088/api/state | jq '{channel_state,telemetry_quality,maintenance_mode,freeze_telemetry,alarm_suppression,maintenance_ticket,override_accepted,scenario_state}'
@@ -153,4 +150,3 @@ curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 sleep 8
 curl -sS http://<ip>:8088/api/state | jq '.active_power_mw'
 ```
-

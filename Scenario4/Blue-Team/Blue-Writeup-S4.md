@@ -4,15 +4,13 @@
 
 ## Starting information
 
-Scenario 3 identifies the dispatch control authority and IEC-104 telecontrol relationship. Investigate the legitimate master/outstation communication in this scenario.
+Dispatch telemetry has become stale and the legitimate master has experienced repeated disconnections. The investigation compares the master timeline, network traffic and experiment-gateway records to identify the source of interference.
 
 Use the address assigned to this scenario by the exercise platform or instructor. Each stage has its own assigned deployment. Follow the engineering clue to identify the next asset, then open that stage using its assigned address.
 
 **Exercise method:** The supplied participant gateway starts a fixed 95-second APCI sequence-modification experiment within the existing master/outstation path. The Blue Team correlates the gateway request with master disconnections and telemetry loss.
 
 Run host commands on the assigned defender VM. Replace `<ip>` in each command with the address for the named role: local service, legitimate master, outstation, or participant. Packet filters comparing two endpoints require their respective addresses.
-
-**Walkthrough:** Detection → event and network investigation → containment or restoration procedures → operational checks.
 
 ## Blue Team SOC Investigation: IEC-104 Session Integrity
 
@@ -269,4 +267,3 @@ systemctl is-active prabal-s04-participant-gateway.service
 **Observed:** `inactive`.
 
 ![B13 - Participant gateway stopped](images/B13-SOC-Containment.png)
-
