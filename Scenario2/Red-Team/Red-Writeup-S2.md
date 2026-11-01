@@ -238,7 +238,7 @@ After examining how Modbus writes changed the governor setpoint, the investigati
 
 ### 9.1 Access the engineering interface
 
-With the governor's Modbus control path already examined, the investigation continued to the OpenPLC engineering interface. Port 8080 had been filtered from the earlier remote position; the next stage used separate lab access to reach the interface and sign in with the default OpenPLC credentials. This opened the controller's hardware configuration for further inspection.
+With the governor's Modbus control path already examined, the investigation continued to the OpenPLC engineering interface. The engineering webserver on port 8080 was accessed from a position where it was reachable, and the default OpenPLC credentials were used to sign in. The Hardware page then provided access to the controller's hardware-layer configuration.
 
 The operator opened the engineering interface at `http://<ip>:8080/` and signed in.
 
