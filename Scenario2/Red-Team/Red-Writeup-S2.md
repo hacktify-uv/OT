@@ -232,15 +232,13 @@ curl -sS http://${TARGET}:8090/api/intertie
 ```
 
 
-## 9. Additional OpenPLC engineering-interface test
+## 9. Investigate the OpenPLC engineering interface
 
-After the Modbus generation-bias walkthrough, a separate test examined the OpenPLC engineering interface. The objective was to assess the hardware-layer editor and observe how a custom hardware configuration affected the native PLC runtime.
-
-This test used OpenPLC Runtime v3 revision `68d46cf5bbe1be7316acac55b3f2f7751c0cf550`, with a legacy Python 2.7 engineering webserver on TCP **8080**, native Modbus/TCP on **502**, and the operator console on **8090**. It was performed on 1 November 2026. The original `prabal_unit2.st` program was running at the **650 MW** baseline before the hardware-layer test.
+After examining how Modbus writes changed the governor setpoint, the investigation moved to the controller's engineering functions. The next objective was to inspect the hardware-layer editor and examine how a custom hardware configuration affected the native PLC runtime.
 
 ### 9.1 Access the engineering interface
 
-The earlier reconnaissance showed engineering port 8080 filtered from the participant's remote position. In this supplementary test, the engineering interface was accessed separately using the lab's default OpenPLC credentials. This additional access is distinct from the unauthenticated Modbus register writes described above.
+With the governor's Modbus control path already examined, the investigation continued to the OpenPLC engineering interface. Port 8080 had been filtered from the earlier remote position; the next stage used separate lab access to reach the interface and sign in with the default OpenPLC credentials. This opened the controller's hardware configuration for further inspection.
 
 The operator opened the engineering interface at `http://<ip>:8080/` and signed in.
 
